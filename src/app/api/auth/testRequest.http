@@ -1,0 +1,23 @@
+POST http://localhost:3000/api/auth/register
+content-type: application/json
+
+{
+  "email": "williamkasbar1@gmail.com",
+  "password": "password123",
+  "name": "Albert",
+  "lastname": "Palacios"
+}
+
+###
+
+POST http://localhost:3000/api/auth/login
+content-type: application/json
+
+{
+  "email": "williamkasbar1@gmail.com",
+  "password": "password123"
+}
+
+###
+
+POST http://localhost:3000/api/auth/logout

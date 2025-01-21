@@ -1,10 +1,27 @@
 import { useEffect } from "react";
-import { testSupabaseConnection } from "./client";
+import { supabase } from "./client";
+
+export const supabaseConnection = async () => {
+  try {
+    const { data, error } = await supabase.from("users").select("*");
+
+    if (error) {
+      console.error("Error al conectar con Supabase:", error.message);
+      return false;
+    }
+
+    console.log("Conexión exitosa. Datos:", data);
+    return true;
+  } catch (err) {
+    console.error("Error inesperado:", err);
+    return false;
+  }
+};
 
 const TestConnection = () => {
   useEffect(() => {
     const checkConnection = async () => {
-      const success = await testSupabaseConnection();
+      const success = await supabaseConnection();
       if (success) {
         console.log("¡Conexión a Supabase exitosa!");
       } else {
