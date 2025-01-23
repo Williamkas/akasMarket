@@ -25,6 +25,13 @@ export async function POST(request: Request) {
     });
 
     if (error) {
+      // Se verifica si el error indica que el usuario ya existe:
+      if (error.message.includes("already registered")) {
+        return NextResponse.json(
+          { error: "User already exists." },
+          { status: 400 }
+        );
+      }
       console.error("Error in Supabase:", error.message);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
