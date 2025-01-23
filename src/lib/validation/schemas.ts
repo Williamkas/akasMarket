@@ -16,25 +16,28 @@ export const loginSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters long."),
 });
 
-// Esquema para los parámetros de paginación de productos
 export const productsSchema = z.object({
   page: z
     .string()
-    .default("1")
-    // El .refine() evalua si es false o true. Si es false se muestra el mensaje de error:
-    .refine((value) => !isNaN(parseInt(value)), {
+    // Se permite que el valor sea null:
+    .nullable()
+    // Se transforma null en los valores predeterminados "1" y "10":
+    .transform((value) => (value === null ? "1" : value))
+    // Se asegura que el valor no sea null y que sea un número válido. Si la validación es false se muestra el mensaje de error:
+    .refine((value) => value !== null && !isNaN(parseInt(value)), {
       message: "Page must be a number",
     })
-    .transform((value) => parseInt(value)),
+    // Se transforma la cadena en un número entero.
+    .transform((value) => (value === null ? 1 : parseInt(value))),
 
   limit: z
     .string()
-    .default("10")
-    .refine((value) => !isNaN(parseInt(value)), {
+    .nullable()
+    .transform((value) => (value === null ? "10" : value))
+    .refine((value) => value !== null && !isNaN(parseInt(value)), {
       message: "Limit must be a number",
     })
-    .transform((value) => parseInt(value)),
+    .transform((value) => (value === null ? 10 : parseInt(value))),
 });
 
-// Esquema de validación para el ID del producto
 export const productIdSchema = z.string().uuid("Invalid product ID format");

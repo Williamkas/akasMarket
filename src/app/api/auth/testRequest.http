@@ -1,3 +1,4 @@
+// REGISTER:
 POST http://localhost:3000/api/auth/register
 content-type: application/json
 
@@ -9,6 +10,7 @@ content-type: application/json
 }
 
 ###
+// LOGIN:
 POST http://localhost:3000/api/auth/login
 content-type: application/json
 
@@ -18,10 +20,13 @@ content-type: application/json
 }
 
 ###
+// LOGOUT:
 POST http://localhost:3000/api/auth/logout
 
 ###
+// PRODUCTS:
 GET http://localhost:3000/api/products
 
 ###
-GET http://localhost:3000/api/products/[id]
+// PRODUCT_ID:
+GET http://localhost:3000/api/products/b5cd991f-4425-48de-acf1-6376916bcc61
