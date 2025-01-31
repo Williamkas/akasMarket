@@ -41,3 +41,16 @@ export const productsSchema = z.object({
 });
 
 export const productIdSchema = z.string().uuid("Invalid product ID format");
+
+// Esquema de validación para los datos del carrito
+export const cartSchema = z.object({
+  userId: z.string().uuid("Invalid user ID format"),
+  items: z.array(
+    z.object({
+      productId: z.string().uuid("Invalid product ID format"),
+      quantity: z.number().min(1, "Quantity must be at least 1"),
+    })
+  ),
+});
+
+export const cartIdSchema = z.string().uuid("Invalid cart ID format");

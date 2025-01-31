@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase/client";
 import { productIdSchema } from "@/lib/validation/schemas";
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-  const { id } = params;
+export async function GET(request: Request, context: { params: { id: string } }) {
+    const { id } = await context.params;
 
   // Validación del ID con Zod
   const validation = productIdSchema.safeParse(id);

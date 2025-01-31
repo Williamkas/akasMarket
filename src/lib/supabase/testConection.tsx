@@ -3,7 +3,7 @@ import { supabase } from "./client";
 
 export const supabaseConnection = async () => {
   try {
-    const { data, error } = await supabase.from("users").select("*");
+    const { data, error } = await supabase.from("products").select("*");
 
     if (error) {
       console.error("Error al conectar con Supabase:", error.message);

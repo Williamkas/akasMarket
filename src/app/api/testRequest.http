@@ -1,0 +1,53 @@
+// CREATE REGISTER:
+POST http://localhost:3000/api/auth/register
+content-type: application/json
+
+{
+  "email": "williamkasbar1@gmail.com",
+  "password": "password123",
+  "name": "Albert",
+  "lastname": "Palacios"
+}
+
+###
+// LOGIN:
+POST http://localhost:3000/api/auth/login
+content-type: application/json
+
+{
+  "email": "williamkasbar1@gmail.com",
+  "password": "password123"
+}
+
+###
+// LOGOUT:
+POST http://localhost:3000/api/auth/logout
+
+###
+// PRODUCTS:
+GET http://localhost:3000/api/products
+
+###
+// PRODUCT_ID:
+GET http://localhost:3000/api/products/b5cd991f-4425-48de-acf1-6376916bcc61
+
+###
+// CREATE CART:
+POST http://localhost:3000/api/carts
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsImtpZCI6IlNWRy81bUZTOTdhcTZqd04iLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2twbm1yZGNqeHd1dGl1dm54bXRyLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIwZWU5MTc3Ni1lOGY0LTQwNDUtOWNhZC1mMjEyZjcxMGYxYzUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzM4MzU5Mzk4LCJpYXQiOjE3MzgzNTU3OTgsImVtYWlsIjoid2lsbGlhbWthc2JhcjFAZ21haWwuY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6IndpbGxpYW1rYXNiYXIxQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJsYXN0bmFtZSI6IlBhbGFjaW9zIiwibmFtZSI6IkFsYmVydCIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwicm9sZSI6InVzZXIiLCJzdWIiOiIwZWU5MTc3Ni1lOGY0LTQwNDUtOWNhZC1mMjEyZjcxMGYxYzUifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTczODM1NTc5OH1dLCJzZXNzaW9uX2lkIjoiOWM4MGQzYTMtYjFlMC00MmFkLTk3ZTYtMzgxYTE2M2QyYzdmIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.MUDcNncobR4AypkBt4XD7NzPBYurT91gzR36as2fNaE
+
+{
+  "userId": "0ee91776-e8f4-4045-9cad-f212f710f1c5",
+  "items": [
+    {
+      "productId": "b5cd991f-4425-48de-acf1-6376916bcc61",
+      "quantity": 2
+    }
+  ]
+}
+
+###
+// CART_ID:
+GET http://localhost:3000/api/carts/03ec6eb0-33b5-4ce4-9fa0-09800696553a
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsImtpZCI6IlNWRy81bUZTOTdhcTZqd04iLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2twbm1yZGNqeHd1dGl1dm54bXRyLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIwZWU5MTc3Ni1lOGY0LTQwNDUtOWNhZC1mMjEyZjcxMGYxYzUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzM4MzU5Mzk4LCJpYXQiOjE3MzgzNTU3OTgsImVtYWlsIjoid2lsbGlhbWthc2JhcjFAZ21haWwuY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6IndpbGxpYW1rYXNiYXIxQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJsYXN0bmFtZSI6IlBhbGFjaW9zIiwibmFtZSI6IkFsYmVydCIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwicm9sZSI6InVzZXIiLCJzdWIiOiIwZWU5MTc3Ni1lOGY0LTQwNDUtOWNhZC1mMjEyZjcxMGYxYzUifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTczODM1NTc5OH1dLCJzZXNzaW9uX2lkIjoiOWM4MGQzYTMtYjFlMC00MmFkLTk3ZTYtMzgxYTE2M2QyYzdmIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.MUDcNncobR4AypkBt4XD7NzPBYurT91gzR36as2fNaE
