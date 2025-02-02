@@ -38,6 +38,15 @@ export const productsSchema = z.object({
       message: "Limit must be a number",
     })
     .transform((value) => (value === null ? 10 : parseInt(value))),
+  search: z
+    .string()
+    .optional()
+    // Se limpian espacios:
+    .transform((val) => (val ? val.trim() : "")),
+  // Campo por el que ordenamos (nombre o precio)
+  sortBy: z.enum(["name", "price"]).optional().default("name"),
+  // Orden ascendente o descendente:
+  order: z.enum(["asc", "desc"]).optional().default("asc"),
 });
 
 export const productIdSchema = z.string().uuid("Invalid product ID format");

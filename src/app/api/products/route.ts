@@ -5,10 +5,13 @@ import { productsSchema } from "@/lib/validation/schemas";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
 
-  // Validación de datos
+  // 📌 Validación de datos
   const validation = productsSchema.safeParse({
     page: searchParams.get("page"),
     limit: searchParams.get("limit"),
+    search: searchParams.get("search"),
+    sortBy: searchParams.get("sortBy"),
+    order: searchParams.get("order"),
   });
 
   if (!validation.success) {
@@ -18,18 +21,26 @@ export async function GET(request: Request) {
     );
   }
 
-  const { page, limit } = validation.data;
+  const { page, limit, search, sortBy, order } = validation.data;
 
-  // Se calcula el rango de datos basado en la paginación:
+  // 📌 Se calcula el rango de datos basado en la paginación:
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
   try {
-    // Consulta a la tabla `products` con el rango calculado
-    const { data, error, count } = await supabase
+    // 📌 Consulta a la tabla `products` con el rango calculado
+    let query = supabase
       .from("products")
-      .select("*", { count: "exact" }) // Seleccionar todo y contar los resultados totales
+      .select("*", { count: "exact" }) // Selecciona todo y cuenta resultados
+      .order(sortBy, { ascending: order === "asc" }) // Ordenamiento
       .range(from, to);
+
+    // 📌 Aplicar búsqueda si hay un término de búsqueda
+    if (search) {
+      query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
+    }
+
+    const { data, error, count } = await query;
 
     if (error) {
       if (error.code === "PGRST103") {
@@ -39,7 +50,7 @@ export async function GET(request: Request) {
         );
       }
       return NextResponse.json(
-        { error: "Error fetching products" },
+        { error: "Error fetching products", details: error.message },
         { status: 500 }
       );
     }
