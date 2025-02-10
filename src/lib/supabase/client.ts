@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from '@supabase/supabase-js';
 
 // URL y clave anónima desde las variables de entorno
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;

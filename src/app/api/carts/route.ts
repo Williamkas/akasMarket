@@ -1,75 +1,60 @@
-import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase/client";
-import { cartSchema } from "@/lib/validation/schemas";
-import { getAuthenticatedUser } from "@/lib/supabase/userAuth";
+import { NextResponse } from 'next/server';
+import { supabase } from '@/lib/supabase/client';
+import { cartSchema } from '@/lib/validation/schemas';
+import { getAuthenticatedUser } from '@/lib/supabase/userAuth';
+import { handleError } from '@/utils/errorHandler';
+import { CreateCartRequest, CreatedCartResponse } from '@/types/cart';
 
+/**
+ * ✅ Endpoint para crear un nuevo carrito.
+ */
 export async function POST(request: Request) {
-  const authResult = await getAuthenticatedUser(request);
-  const { error: authError, details: authDetails, status, user } = authResult;
-
-  if (authError) {
-    return NextResponse.json(
-      { error: authError, details: authDetails },
-      { status: status }
-    );
-  }
-
-  const body = await request.json();
-
-  // Validación de los datos del carrito
-  const validation = cartSchema.safeParse(body);
-
-  if (!validation.success) {
-    return NextResponse.json(
-      { error: "Invalid cart data", details: validation.error.errors },
-      { status: 400 }
-    );
-  }
-
-  const { items } = validation.data;
-
   try {
-    // Crear el carrito
+    // 📌 Validar usuario autenticado
+    const authResult = await getAuthenticatedUser(request);
+    if (authResult.error) {
+      return handleError(authResult.status, authResult.message);
+    }
+
+    const { user } = authResult;
+    const body: CreateCartRequest = await request.json();
+
+    // 📌 Validar los datos del carrito
+    const validation = cartSchema.safeParse(body);
+    if (!validation.success) {
+      return handleError(400, 'Invalid cart data', validation.error.errors);
+    }
+
+    const { items } = validation.data;
+
+    // 📌 Crear el carrito
     const { data: cartData, error: cartError } = await supabase
-      .from("carts")
+      .from('carts')
       .insert([{ user_id: user.id }])
       .select()
       .single();
 
-    if (cartError) {
-      console.error("Error creating cart:", cartError.message);
-      return NextResponse.json(
-        { error: "Error creating cart" },
-        { status: 500 }
-      );
+    if (cartError || !cartData) {
+      return handleError(500, 'Error creating cart', cartError);
     }
 
-    // Crear los ítems del carrito
+    // 📌 Crear los ítems del carrito
     const cartItems = items.map((item) => ({
       cart_id: cartData.id,
       product_id: item.productId,
-      quantity: item.quantity,
+      quantity: item.quantity
     }));
 
-    const { error: cartItemsError } = await supabase
-      .from("cart_items")
-      .insert(cartItems);
-
+    const { error: cartItemsError } = await supabase.from('cart_items').insert(cartItems);
     if (cartItemsError) {
-      console.error("Error creating cart items:", cartItemsError.message);
-      return NextResponse.json(
-        { error: "Error creating cart items", details: cartItemsError.message },
-        { status: 500 }
-      );
+      return handleError(500, 'Error creating cart items', cartItemsError);
     }
 
-    return NextResponse.json(cartData, { status: 201 });
+    // 📌 Respuesta tipada
+    const response: CreatedCartResponse = cartData;
+    return NextResponse.json(response, { status: 201 });
   } catch (error) {
-    console.error("Internal Server Error:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error", details: error.message },
-      { status: 500 }
-    );
+    return handleError(500, 'Internal Server Error', error);
   }
 }
 
