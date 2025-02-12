@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase/client';
-import { cartIdSchema } from '@/lib/validation/schemas';
+import { cartIdSchema, cartSchema } from '@/lib/validation/schemas';
 import { getAuthenticatedUser } from '@/lib/supabase/userAuth';
-import { handleError } from '@/utils/errorHandler';
+import { handleError } from '@/utils/apiHelpers';
 import { CartData, CartItemInput } from '@/types/cart';
 import { User, UserMetadata } from '@/types/user';
 
@@ -50,7 +50,7 @@ export async function GET(request: Request, context: { params: { id: string } })
       )
       .eq('id', id)
       .eq('user_id', user.id) // Asegura que el carrito pertenece al usuario autenticado
-      .single<CartData>();
+      .single();
 
     if (cartError) {
       return handleError(500, 'Error fetching cart', cartError);

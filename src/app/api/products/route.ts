@@ -1,38 +1,40 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase/client';
-import { productsSchema } from '@/lib/validation/schemas';
-import { handleError } from '@/utils/errorHandler';
+import { productsSchema, productCreateSchema } from '@/lib/validation/schemas';
+import { handleError } from '@/utils/apiHelpers';
 import { ProductQueryParams, ProductListResponse } from '@/types/product';
+import { getAuthenticatedAdminUser } from '@/lib/supabase/userAuth';
 
 /**
  * ✅ Endpoint para obtener una lista paginada de productos.
  */
 export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+
+  // 📌 Validación de los parámetros de consulta
+  const validation = productsSchema.safeParse({
+    page: searchParams.get('page'),
+    limit: searchParams.get('limit'),
+    search: searchParams.get('search'),
+    sortBy: searchParams.get('sortBy'),
+    order: searchParams.get('order')
+  });
+
+  if (!validation.success) {
+    return handleError(400, 'Invalid query parameters', validation.error.errors);
+  }
+
+  const { page, limit, search, sortBy, order }: ProductQueryParams = validation.data;
+
+  // 📌 Se calcula el rango de datos para la paginación
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+
   try {
-    const { searchParams } = new URL(request.url);
-
-    // 📌 Validar parámetros de consulta
-    const validation = productsSchema.safeParse({
-      page: searchParams.get('page'),
-      limit: searchParams.get('limit'),
-      search: searchParams.get('search'),
-      sortBy: searchParams.get('sortBy'),
-      order: searchParams.get('order')
-    });
-
-    if (!validation.success) {
-      return handleError(400, 'Invalid query parameters', validation.error.errors);
-    }
-
-    const { page, limit, search, sortBy, order }: ProductQueryParams = validation.data;
-
-    // 📌 Calcular el rango de datos basado en la paginación
-    const from = (page - 1) * limit;
-    const to = from + limit - 1;
-
+    // 📌 Consulta a la tabla `products` con el rango y orden especificados
     let query = supabase
       .from('products')
-      .select('*', { count: 'exact' })
+      .select('*', { count: 'exact' }) // Selección de todos los campos y contar resultados
       .order(sortBy, { ascending: order === 'asc' })
       .range(from, to);
 
@@ -44,7 +46,10 @@ export async function GET(request: Request) {
     const { data, error, count } = await query;
 
     if (error) {
-      return handleError(500, 'Error fetching products', error);
+      if (error.code === 'PGRST103') {
+        return NextResponse.json({ message: 'No more products available in this range.' }, { status: 400 });
+      }
+      return handleError(500, 'Error fetching products', error.message);
     }
 
     if (!data || data.length === 0) {
@@ -77,6 +82,7 @@ export async function GET(request: Request) {
 
 /**
  * ✅ Endpoint para crear un nuevo producto.
+ *    Solo un administrador puede crear productos.
  */
 export async function POST(request: Request) {
   try {
@@ -94,10 +100,10 @@ export async function POST(request: Request) {
       return handleError(400, 'Invalid product data', validation.error.errors);
     }
 
-    const { data, error } = await supabase.from('products').insert([validation.data]);
+    const { data, error } = await supabase.from('products').insert([validation.data]).select();
 
-    if (error) {
-      return handleError(500, 'Error creating product', error);
+    if (error || !data) {
+      return handleError(500, 'Error creating product', error?.message);
     }
 
     return NextResponse.json({ message: 'Product created successfully', data }, { status: 201 });

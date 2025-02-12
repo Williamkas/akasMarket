@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase/client';
 import { cartSchema } from '@/lib/validation/schemas';
 import { getAuthenticatedUser } from '@/lib/supabase/userAuth';
-import { handleError } from '@/utils/errorHandler';
+import { handleError } from '@/utils/apiHelpers';
 import { CreateCartRequest, CreatedCartResponse } from '@/types/cart';
 
 /**

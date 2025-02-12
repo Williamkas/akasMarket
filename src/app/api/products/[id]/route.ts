@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase/client';
 import { productIdSchema, productCreateSchema } from '@/lib/validation/schemas';
 import { getAuthenticatedAdminUser } from '@/lib/supabase/userAuth';
-import { handleError } from '@/utils/errorHandler';
-import { Product, ProductUpdateRequest } from '@/types/product';
+import { handleError } from '@/utils/apiHelpers';
+import { ProductUpdateRequest } from '@/types/product';
 
 /**
  * ✅ Endpoint para obtener un producto por su ID.
@@ -15,10 +15,11 @@ export async function GET(request: Request, context: { params: { id: string } })
     // 📌 Validar ID del producto
     const validation = productIdSchema.safeParse(id);
     if (!validation.success) {
-      return handleError(400, 'Invalid product ID', validation.error.errors);
+      return handleError(400, 'Invalid product ID format', validation.error.errors);
     }
 
-    const { data, error } = await supabase.from('products').select('*').eq('id', id).single<Product>();
+    // 📌 Buscamos el producto en la base de datos.
+    const { data, error } = await supabase.from('products').select('*').eq('id', id).single();
 
     if (error) {
       return handleError(500, 'Error fetching product', error);
@@ -64,9 +65,10 @@ export async function PATCH(request: Request, context: { params: { id: string } 
     const { data, error } = await supabase
       .from('products')
       .update(validation.data as ProductUpdateRequest)
-      .eq('id', id);
+      .eq('id', id)
+      .select();
 
-    if (error) {
+    if (error || !data) {
       return handleError(500, 'Error updating product', error);
     }
 
