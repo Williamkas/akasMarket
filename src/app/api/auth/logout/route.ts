@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase/client';
-import { handleError } from '@/utils/errorHandler';
+import { handleError } from '@/utils/apiHelpers';
 
 /**
  * ✅ Endpoint para cerrar sesión.

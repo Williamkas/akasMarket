@@ -1,22 +1,22 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase/client';
-import { loginSchema } from '@/lib/validation/schemas';
 import { handleError } from '@/utils/apiHelpers';
+import { sendResetEmailSchema } from '@/lib/validation/schemas';
 
 /**
- * ✅ Endpoint para iniciar sesión.
+ * ✅ Endpoint para enviar un enlace de restablecimiento de contraseña.
  */
 export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    // 📌 Validar los datos del cuerpo de la solicitud
-    const validation = loginSchema.safeParse(body);
+    // 📌 Validar con Zod
+    const validation = sendResetEmailSchema.safeParse(body);
     if (!validation.success) {
       return handleError(400, 'Invalid data', validation.error.errors);
     }
 
-    const { email, password } = validation.data;
+    const { email } = validation.data;
 
     // 📌 Verificación previa: Verificar si el correo o el nombre de usuario ya existe
     const { data: existingEmail, error: emailError } = await supabase.rpc('get_user_by_email', { email: email });
@@ -28,15 +28,17 @@ export async function POST(request: Request) {
       return handleError(500, 'Error during email verification', emailError.message);
     }
 
-    // 📌 Autenticar al usuario en Supabase
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    // 📌 Enviar el enlace de restablecimiento de contraseña
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/reset-password?token={access_token}`
+    });
 
     if (error) {
-      return handleError(401, 'Invalid credentials');
+      return handleError(500, 'Error sending reset password email', error.message);
     }
 
     return NextResponse.json(
-      { message: 'Login successful', user: data.user, accessToken: data.session?.access_token },
+      { message: 'Password reset email sent successfully. Please check your inbox.' },
       { status: 200 }
     );
   } catch (error) {

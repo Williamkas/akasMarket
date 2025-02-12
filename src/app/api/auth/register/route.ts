@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase/client';
 import { registerSchema } from '@/lib/validation/schemas';
-import { handleError } from '@/utils/errorHandler';
+import { handleError } from '@/utils/apiHelpers';
 
 /**
  * ✅ Endpoint para registrar un nuevo usuario.
@@ -18,6 +18,16 @@ export async function POST(request: Request) {
 
     const { email, password, name, lastname } = validation.data;
 
+    // 📌 Verificación previa: Verificar si el correo o el nombre de usuario ya existe
+    const { data: existingEmail, error: emailError } = await supabase.rpc('get_user_by_email', { email: email });
+
+    if (!!existingEmail) {
+      return handleError(400, 'Email already registered');
+    }
+    if (emailError) {
+      return handleError(500, 'Error during email verification', emailError.message);
+    }
+
     // 📌 Registrar al usuario en Supabase
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -32,7 +42,7 @@ export async function POST(request: Request) {
       if (error.message.includes('already registered')) {
         return handleError(400, 'User already exists.');
       }
-      return handleError(500, 'Error during registration', error);
+      return handleError(500, 'Error during registration', error.message);
     }
 
     return NextResponse.json({ message: 'User registered successfully', user: data.user }, { status: 201 });

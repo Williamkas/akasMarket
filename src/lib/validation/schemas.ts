@@ -67,3 +67,18 @@ export const cartSchema = z.object({
 });
 
 export const cartIdSchema = z.string().uuid('Invalid cart ID format');
+
+export const changePasswordSchema = z.object({
+  email: z.string().email('The email address is not valid.'),
+  oldPassword: z.string().min(6, 'The old password must be at least 6 characters long.'),
+  newPassword: z.string().min(6, 'The new password must be at least 6 characters long.')
+});
+
+export const sendResetEmailSchema = z.object({
+  email: z.string().email('The email address is not valid.')
+});
+
+export const resetPasswordSchema = z.object({
+  password: z.string().min(6, 'The password must be at least 6 characters long.'),
+  token: z.string().min(1, 'Token is required.')
+});

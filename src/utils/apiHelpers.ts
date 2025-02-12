@@ -26,6 +26,9 @@ export function handleError(status: number = 500, message: string, details?: unk
 
   if (details instanceof Error) {
     safeDetails = details.message;
+  } else if (Array.isArray(details)) {
+    // Si `details` es un arreglo, mapeamos para mostrar los mensajes de error
+    safeDetails = details.map((error: Record<string, unknown>) => `Path: ${error.validation}, message: ${error.message}`).join(', ');
   } else if (typeof details === 'string') {
     safeDetails = details;
   } else {
