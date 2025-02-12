@@ -50,7 +50,7 @@ export async function GET(request: Request, context: { params: { id: string } })
       )
       .eq('id', id)
       .eq('user_id', user.id) // Asegura que el carrito pertenece al usuario autenticado
-      .single();
+      .single<CartData>();
 
     if (cartError) {
       return handleError(500, 'Error fetching cart', cartError);
@@ -61,8 +61,8 @@ export async function GET(request: Request, context: { params: { id: string } })
     }
 
     // 📌 Calcular la cantidad total de productos y el precio total
-    const totalQuantity = cartData.items.reduce((sum, item: CartItemInput) => sum + item.quantity, 0);
-    const totalPrice = cartData.items.reduce((sum, item: CartItemInput) => sum + item.quantity * item.product.price, 0);
+    const totalQuantity = cartData.items.reduce((sum, item) => sum + item.quantity, 0);
+    const totalPrice = cartData.items.reduce((sum, item) => sum + item.quantity * (item.product?.price || 0), 0);
 
     const userMetadata: UserMetadata = user.metadata ?? {};
 
