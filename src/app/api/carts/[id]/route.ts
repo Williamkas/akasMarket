@@ -6,18 +6,20 @@ import { handleError } from '@/utils/apiHelpers';
 import { CartData, CartItemInput } from '@/types/cart';
 import { User, UserMetadata } from '@/types/user';
 
-interface Context {
-  params: {
-    id: string;
-  };
-}
-
 /**
  * ✅ Endpoint para recuperar un carrito por su ID.
  */
-export async function GET(request: NextRequest, context: Context) {
+export async function GET(request: NextRequest) {
   try {
-    const { id } = context.params;
+    const { pathname } = request.nextUrl;
+    console.log("🚀 ~ GET ~ pathname:", pathname)
+    // 📌 Se obtiene el parámetro dinámico `id` desde la URL
+    const id = pathname.split('/').pop() || '';
+    
+    // 📌 Se valida si `id` está presente
+    if (!id) {
+      return handleError(400, 'Missing ID parameter');
+    }
 
     // 📌 Validar ID del carrito
     const validation = cartIdSchema.safeParse(id);
