@@ -1,8 +1,13 @@
 import { NextResponse } from 'next/server';
 
 type ErrorResponse = {
-  error: string;
-  details?: string;
+  success: false;
+  error: {
+    message: string;
+    code?: string;
+    details?: string;
+  };
+  data: null;
 };
 
 /**
@@ -10,9 +15,15 @@ type ErrorResponse = {
  * @param status Código de estado HTTP (por defecto 500).
  * @param message Mensaje de error principal.
  * @param details Detalles adicionales del error (opcional).
+ * @param code Código de error interno (opcional).
  * @returns NextResponse con el error formateado.
  */
-export function handleError(status: number = 500, message: string, details?: unknown): NextResponse<ErrorResponse> {
+export function handleError(
+  status: number = 500,
+  message: string,
+  details?: unknown,
+  code?: string
+): NextResponse<ErrorResponse> {
   console.error(`Error ${status}:`, message, details);
 
   // 🔹 Mapeo de mensajes personalizados según código de error
@@ -28,7 +39,9 @@ export function handleError(status: number = 500, message: string, details?: unk
     safeDetails = details.message;
   } else if (Array.isArray(details)) {
     // Si `details` es un arreglo, mapeamos para mostrar los mensajes de error
-    safeDetails = details.map((error: Record<string, unknown>) => `Path: ${error.validation}, message: ${error.message}`).join(', ');
+    safeDetails = details
+      .map((error: Record<string, unknown>) => `Path: ${error.validation}, message: ${error.message}`)
+      .join(', ');
   } else if (typeof details === 'string') {
     safeDetails = details;
   } else {
@@ -46,8 +59,13 @@ export function handleError(status: number = 500, message: string, details?: unk
 
   return NextResponse.json(
     {
-      error: statusMessages[status] || message,
-      details: safeDetails
+      success: false,
+      error: {
+        message: statusMessages[status] || message,
+        code,
+        details: safeDetails
+      },
+      data: null
     },
     { status }
   );

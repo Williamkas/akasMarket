@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { supabase } from '@/lib/supabase/client';
 import { cartIdSchema, cartSchema } from '@/lib/validation/schemas';
 import { getAuthenticatedUser } from '@/lib/supabase/userAuth';
@@ -9,7 +9,7 @@ import { User, UserMetadata } from '@/types/user';
 /**
  * ✅ Endpoint para recuperar un carrito por su ID.
  */
-export async function GET(request: Request, context: { params: { id: string } }) {
+export async function GET(request: NextRequest, context: { params: { id: string } }) {
   try {
     const { id } = context.params;
 
