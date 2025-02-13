@@ -6,12 +6,18 @@ import { handleError } from '@/utils/apiHelpers';
 import { CartData, CartItemInput } from '@/types/cart';
 import { User, UserMetadata } from '@/types/user';
 
+interface Context {
+  params: {
+    id: string;
+  };
+}
+
 /**
  * ✅ Endpoint para recuperar un carrito por su ID.
  */
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, context: Context) {
   try {
-    const { id } = params;
+    const { id } = context.params;
 
     // 📌 Validar ID del carrito
     const validation = cartIdSchema.safeParse(id);
