@@ -8,9 +8,9 @@ import { ProductUpdateRequest } from '@/types/product';
 /**
  * ✅ Endpoint para obtener un producto por su ID.
  */
-export async function GET(request: Request, context: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
-    const { id } = context.params;
+    const { id } = params;
 
     // 📌 Validar ID del producto
     const validation = productIdSchema.safeParse(id);

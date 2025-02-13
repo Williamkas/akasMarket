@@ -9,9 +9,9 @@ import { User, UserMetadata } from '@/types/user';
 /**
  * ✅ Endpoint para recuperar un carrito por su ID.
  */
-export async function GET(request: NextRequest, context: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const { id } = context.params;
+    const { id } = params;
 
     // 📌 Validar ID del carrito
     const validation = cartIdSchema.safeParse(id);
