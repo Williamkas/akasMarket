@@ -12,10 +12,9 @@ import { User, UserMetadata } from '@/types/user';
 export async function GET(request: NextRequest) {
   try {
     const { pathname } = request.nextUrl;
-    console.log("🚀 ~ GET ~ pathname:", pathname)
     // 📌 Se obtiene el parámetro dinámico `id` desde la URL
     const id = pathname.split('/').pop() || '';
-    
+
     // 📌 Se valida si `id` está presente
     if (!id) {
       return handleError(400, 'Missing ID parameter');
@@ -102,9 +101,16 @@ export async function GET(request: NextRequest) {
 /**
  * ✅ Endpoint para actualizar un carrito existente.
  */
-export async function PATCH(request: Request, context: { params: { id: string } }) {
+export async function PATCH(request: NextRequest) {
   try {
-    const { id } = context.params;
+    const { pathname } = request.nextUrl;
+    // 📌 Se obtiene el parámetro dinámico `id` desde la URL
+    const id = pathname.split('/').pop() || '';
+
+    // 📌 Se valida si `id` está presente
+    if (!id) {
+      return handleError(400, 'Missing ID parameter');
+    }
 
     // 📌 Validar ID del carrito
     const idValidation = cartIdSchema.safeParse(id);

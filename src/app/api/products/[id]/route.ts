@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { supabase } from '@/lib/supabase/client';
 import { productIdSchema, productCreateSchema } from '@/lib/validation/schemas';
 import { getAuthenticatedAdminUser } from '@/lib/supabase/userAuth';
@@ -8,9 +8,16 @@ import { ProductUpdateRequest } from '@/types/product';
 /**
  * ✅ Endpoint para obtener un producto por su ID.
  */
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest) {
   try {
-    const { id } = params;
+    const { pathname } = request.nextUrl;
+    // 📌 Se obtiene el parámetro dinámico `id` desde la URL
+    const id = pathname.split('/').pop() || '';
+
+    // 📌 Se valida si `id` está presente
+    if (!id) {
+      return handleError(400, 'Missing ID parameter');
+    }
 
     // 📌 Validar ID del producto
     const validation = productIdSchema.safeParse(id);
@@ -38,10 +45,16 @@ export async function GET(request: Request, { params }: { params: { id: string }
 /**
  * ✅ Endpoint para actualizar un producto existente.
  */
-export async function PATCH(request: Request, context: { params: { id: string } }) {
+export async function PATCH(request: NextRequest) {
   try {
-    const { id } = context.params;
+    const { pathname } = request.nextUrl;
+    // 📌 Se obtiene el parámetro dinámico `id` desde la URL
+    const id = pathname.split('/').pop() || '';
 
+    // 📌 Se valida si `id` está presente
+    if (!id) {
+      return handleError(400, 'Missing ID parameter');
+    }
     // 📌 Validar ID del producto
     const idValidation = productIdSchema.safeParse(id);
     if (!idValidation.success) {
