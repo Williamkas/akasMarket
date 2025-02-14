@@ -1,8 +1,7 @@
-import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase/client';
 import { cartSchema } from '@/lib/validation/schemas';
 import { getAuthenticatedUser } from '@/lib/supabase/userAuth';
-import { handleError } from '@/utils/apiHelpers';
+import { handleError, handleSuccess } from '@/utils/apiHelpers';
 import { CreateCartRequest, CreatedCartResponse } from '@/types/cart';
 
 /**
@@ -52,7 +51,7 @@ export async function POST(request: Request) {
 
     // 📌 Respuesta tipada
     const response: CreatedCartResponse = cartData;
-    return NextResponse.json(response, { status: 201 });
+    return handleSuccess(201, 'Cart created successfully', response);
   } catch (error) {
     return handleError(500, 'Internal Server Error', error);
   }

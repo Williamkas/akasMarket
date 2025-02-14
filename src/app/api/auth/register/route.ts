@@ -1,7 +1,6 @@
-import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase/client';
 import { registerSchema } from '@/lib/validation/schemas';
-import { handleError } from '@/utils/apiHelpers';
+import { handleError, handleSuccess } from '@/utils/apiHelpers';
 
 /**
  * ✅ Endpoint para registrar un nuevo usuario.
@@ -45,7 +44,9 @@ export async function POST(request: Request) {
       return handleError(500, 'Error during registration', error.message);
     }
 
-    return NextResponse.json({ message: 'User registered successfully', user: data.user }, { status: 201 });
+    const response = { user: data.user };
+
+    return handleSuccess(201, 'User registered successfully', response);
   } catch (error) {
     return handleError(500, 'Internal Server Error', error);
   }

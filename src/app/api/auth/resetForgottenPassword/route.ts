@@ -1,6 +1,5 @@
-import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase/client';
-import { handleError } from '@/utils/apiHelpers';
+import { handleError, handleSuccess } from '@/utils/apiHelpers';
 import { sendResetEmailSchema } from '@/lib/validation/schemas';
 
 /**
@@ -37,10 +36,7 @@ export async function POST(request: Request) {
       return handleError(500, 'Error sending reset password email', error.message);
     }
 
-    return NextResponse.json(
-      { message: 'Password reset email sent successfully. Please check your inbox.' },
-      { status: 200 }
-    );
+    return handleSuccess(200, 'Password reset email sent successfully. Please check your inbox.', null);
   } catch (error) {
     return handleError(500, 'Internal Server Error', error);
   }

@@ -1,6 +1,5 @@
-import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase/client';
-import { handleError } from '@/utils/apiHelpers';
+import { handleError, handleSuccess } from '@/utils/apiHelpers';
 import { changePasswordSchema } from '@/lib/validation/schemas';
 
 /**
@@ -45,7 +44,7 @@ export async function POST(request: Request) {
       return handleError(500, 'Error updating password', updateError.message);
     }
 
-    return NextResponse.json({ message: 'Password updated successfully' }, { status: 200 });
+    return handleSuccess(200, 'Password updated successfully', null);
   } catch (error) {
     return handleError(500, 'Internal Server Error', error);
   }

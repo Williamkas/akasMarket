@@ -1,7 +1,6 @@
-import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase/client';
 import { loginSchema } from '@/lib/validation/schemas';
-import { handleError } from '@/utils/apiHelpers';
+import { handleError, handleSuccess } from '@/utils/apiHelpers';
 
 /**
  * ✅ Endpoint para iniciar sesión.
@@ -34,11 +33,9 @@ export async function POST(request: Request) {
     if (error) {
       return handleError(401, 'Invalid credentials');
     }
+    const response = { user: data.user, accessToken: data.session?.access_token };
 
-    return NextResponse.json(
-      { message: 'Login successful', user: data.user, accessToken: data.session?.access_token },
-      { status: 200 }
-    );
+    return handleSuccess(200, 'Login successful', response);
   } catch (error) {
     return handleError(500, 'Internal Server Error', error);
   }

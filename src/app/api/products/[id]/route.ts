@@ -1,8 +1,8 @@
-import { NextResponse, NextRequest } from 'next/server';
+import { NextRequest } from 'next/server';
 import { supabase } from '@/lib/supabase/client';
 import { productIdSchema, productCreateSchema } from '@/lib/validation/schemas';
 import { getAuthenticatedAdminUser } from '@/lib/supabase/userAuth';
-import { handleError } from '@/utils/apiHelpers';
+import { handleError, handleSuccess } from '@/utils/apiHelpers';
 import { ProductUpdateRequest } from '@/types/product';
 
 /**
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   try {
     const { pathname } = request.nextUrl;
     // 📌 Se obtiene el parámetro dinámico `id` desde la URL
-    const id = pathname.split('/').pop() || '';
+    const id = pathname.split('/').at(-1);
 
     // 📌 Se valida si `id` está presente
     if (!id) {
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
       return handleError(404, 'Product not found');
     }
 
-    return NextResponse.json(data, { status: 200 });
+    return handleSuccess(200, 'Product retrieved successfully', data);
   } catch (error) {
     return handleError(500, 'Internal Server Error', error);
   }
@@ -49,7 +49,7 @@ export async function PATCH(request: NextRequest) {
   try {
     const { pathname } = request.nextUrl;
     // 📌 Se obtiene el parámetro dinámico `id` desde la URL
-    const id = pathname.split('/').pop() || '';
+    const id = pathname.split('/').at(-1);
 
     // 📌 Se valida si `id` está presente
     if (!id) {
@@ -85,7 +85,7 @@ export async function PATCH(request: NextRequest) {
       return handleError(500, 'Error updating product', error);
     }
 
-    return NextResponse.json({ message: 'Product updated successfully', data }, { status: 200 });
+    return handleSuccess(200, 'Product updated successfully', data);
   } catch (error) {
     return handleError(500, 'Internal Server Error', error);
   }

@@ -1,14 +1,5 @@
 import { NextResponse } from 'next/server';
-
-type ErrorResponse = {
-  success: false;
-  error: {
-    message: string;
-    code?: string;
-    details?: string;
-  };
-  data: null;
-};
+import { ErrorResponse, SuccessResponse } from '@/types/api';
 
 /**
  * ✅ Maneja errores y devuelve una respuesta JSON con el código de estado adecuado.
@@ -66,6 +57,24 @@ export function handleError(
         details: safeDetails
       },
       data: null
+    },
+    { status }
+  );
+}
+
+/**
+ * ✅ Maneja respuestas exitosas y devuelve una respuesta JSON formateada.
+ * @param status Código de estado HTTP (por defecto 200).
+ * @param message Mensaje de éxito.
+ * @param data Datos de la respuesta.
+ * @returns NextResponse con el resultado formateado.
+ */
+export function handleSuccess<T>(status: number = 200, message: string, data: T): NextResponse<SuccessResponse<T>> {
+  return NextResponse.json(
+    {
+      success: true,
+      message,
+      data
     },
     { status }
   );

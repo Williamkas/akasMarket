@@ -1,8 +1,7 @@
-import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase/client';
 import { productsSchema, productCreateSchema } from '@/lib/validation/schemas';
-import { handleError } from '@/utils/apiHelpers';
-import { ProductQueryParams, ProductListResponse } from '@/types/product';
+import { handleError, handleSuccess } from '@/utils/apiHelpers';
+import { ProductQueryParams } from '@/types/product';
 import { getAuthenticatedAdminUser } from '@/lib/supabase/userAuth';
 
 /**
@@ -46,35 +45,24 @@ export async function GET(request: Request) {
     const { data, error, count } = await query;
 
     if (error) {
-      if (error.code === 'PGRST103') {
-        return NextResponse.json({ message: 'No more products available in this range.' }, { status: 400 });
-      }
-      return handleError(500, 'Error fetching products', error.message);
+      const errorMessage =
+        error.code === 'PGRST103' ? 'No more products available in this range.' : 'Error fetching products';
+      return handleError(400, errorMessage, error.message, error.code);
     }
 
-    if (!data || data.length === 0) {
-      return NextResponse.json(
-        {
-          data: [],
-          count: 0,
-          page,
-          limit,
-          totalPages: 0,
-          message: 'No products available.'
-        },
-        { status: 200 }
-      );
-    }
-
-    const response: ProductListResponse = {
-      data,
+    const response = {
+      data: data ?? [],
       page,
       limit,
       count: count || 0,
       totalPages: Math.ceil((count || 0) / limit)
     };
 
-    return NextResponse.json(response, { status: 200 });
+    return handleSuccess(
+      200,
+      data.length > 0 ? 'Product list retrieved successfully' : 'No products available',
+      response
+    );
   } catch (error) {
     return handleError(500, 'Internal Server Error', error);
   }
@@ -106,7 +94,7 @@ export async function POST(request: Request) {
       return handleError(500, 'Error creating product', error?.message);
     }
 
-    return NextResponse.json({ message: 'Product created successfully', data }, { status: 201 });
+    return handleSuccess(201, 'Product created successfully', { data });
   } catch (error) {
     return handleError(500, 'Internal Server Error', error);
   }
