@@ -32,7 +32,8 @@ export async function POST(request: Request) {
       email,
       password,
       options: {
-        data: { name, lastname, role: 'user' } // Asignar rol automáticamente
+        data: { name, lastname, role: 'user' }, // Asignar rol automáticamente
+        emailRedirectTo: 'http://localhost:3000/auth/welcome'
       }
     });
 
@@ -46,7 +47,11 @@ export async function POST(request: Request) {
 
     const response = { user: data.user };
 
-    return handleSuccess(201, 'User registered successfully', response);
+    return handleSuccess(
+      201,
+      'User registered successfully, please check your email to confirm your account.',
+      response
+    );
   } catch (error) {
     return handleError(500, 'Internal Server Error', error);
   }

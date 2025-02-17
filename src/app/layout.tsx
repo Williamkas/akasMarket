@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { Geist, Geist_Mono } from 'next/font/google';
+import { Toaster } from 'sonner';
 import './globals.css';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -32,6 +33,18 @@ export default function RootLayout({
           <Header />
           {children}
           <Footer />
+          <Toaster
+            position='bottom-center' // Cambiar la posición del toast
+            duration={4000} // Duración en milisegundos (4 segundos en este caso)
+            toastOptions={{
+              className: 'text-lg font-bold', // Aquí se ajusta el tamaño del texto y otras clases
+              style: {
+                background: 'green', // Puedes personalizar los colores aquí si lo deseas
+                color: 'white',
+                borderRadius: '8px'
+              }
+            }}
+          />
         </Suspense>
       </body>
     </html>

@@ -17,12 +17,6 @@ export function handleError(
 ): NextResponse<ErrorResponse> {
   console.error(`Error ${status}:`, message, details);
 
-  // 🔹 Mapeo de mensajes personalizados según código de error
-  const statusMessages: Record<number, string> = {
-    401: 'Unauthorized access',
-    403: 'Forbidden access'
-  };
-
   // 🔹 Serialización segura de `details`
   let safeDetails: string | undefined;
 
@@ -52,7 +46,7 @@ export function handleError(
     {
       success: false,
       error: {
-        message: statusMessages[status] || message,
+        message: message,
         code,
         details: safeDetails
       },

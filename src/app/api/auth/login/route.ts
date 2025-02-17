@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     // 📌 Verificación previa: Verificar si el correo o el nombre de usuario ya existe
     const { data: existingEmail, error: emailError } = await supabase.rpc('get_user_by_email', { email: email });
 
-    if (!existingEmail) {
+    if (!existingEmail || existingEmail.length === 0) {
       return handleError(400, 'User not registered');
     }
     if (emailError) {
