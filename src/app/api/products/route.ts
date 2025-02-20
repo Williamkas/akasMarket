@@ -84,17 +84,30 @@ export async function POST(request: Request) {
 
     // 📌 Validar los datos del producto
     const validation = productCreateSchema.safeParse(body);
-    if (!validation.success) {
-      return handleError(400, 'Invalid product data', validation.error.errors);
-    }
+    if (!validation.success) return handleError(400, 'Invalid product data', validation.error.errors);
 
-    const { data, error } = await supabase.from('products').insert([validation.data]).select();
+    const { images, ...productData } = validation.data;
 
-    if (error || !data) {
-      return handleError(500, 'Error creating product', error?.message);
-    }
+    // Insertar producto
+    const { data: product, error: productError } = await supabase
+      .from('products')
+      .insert([{ ...productData, main_image_url: images[0] }])
+      .select()
+      .single();
 
-    return handleSuccess(201, 'Product created successfully', { data });
+    if (productError || !product) return handleError(500, 'Error creating product', productError);
+
+    // Insertar imágenes
+    const imageRecords = images.map((url, index) => ({
+      product_id: product.id,
+      image_url: url,
+      is_primary: index === 0
+    }));
+
+    const { error: imagesError } = await supabase.from('product_images').insert(imageRecords);
+    if (imagesError) return handleError(500, 'Error saving product images', imagesError);
+
+    return handleSuccess(201, 'Product created successfully', product);
   } catch (error) {
     return handleError(500, 'Internal Server Error', error);
   }

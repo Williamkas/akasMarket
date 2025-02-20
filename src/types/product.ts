@@ -39,5 +39,3 @@ export interface ProductUpdateResponse {
 }
 
 export type ProductCreateRequest = Omit<Product, 'id' | 'created_at'>;
-
-export type ProductUpdateRequest = Partial<ProductCreateRequest>;
