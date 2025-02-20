@@ -33,7 +33,7 @@ export async function POST(request: Request) {
       password,
       options: {
         data: { name, lastname, role: 'user' }, // Asignar rol automáticamente
-        emailRedirectTo: 'http://localhost:3000/auth/welcome'
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/login?welcome`
       }
     });
 

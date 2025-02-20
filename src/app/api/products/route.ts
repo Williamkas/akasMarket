@@ -12,11 +12,11 @@ export async function GET(request: Request) {
 
   // 📌 Validación de los parámetros de consulta
   const validation = productsSchema.safeParse({
-    page: searchParams.get('page'),
-    limit: searchParams.get('limit'),
-    search: searchParams.get('search'),
-    sortBy: searchParams.get('sortBy'),
-    order: searchParams.get('order')
+    page: searchParams.get('page') ?? '1',
+    limit: searchParams.get('limit') ?? '10',
+    search: searchParams.get('search') ?? '',
+    sortBy: searchParams.get('sortBy') ?? 'name',
+    order: searchParams.get('order') ?? 'asc'
   });
 
   if (!validation.success) {

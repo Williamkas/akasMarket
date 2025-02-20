@@ -48,22 +48,33 @@ export const productsSchema = z.object({
     // Se limpian espacios:
     .transform((val) => (val ? val.trim() : '')),
   // Campo por el que ordenamos (nombre o precio)
-  sortBy: z.enum(['name', 'price']).optional().default('name'),
+  sortBy: z
+    .enum(['name', 'price'])
+    .nullable()
+    .transform((val) => val ?? 'name'),
   // Orden ascendente o descendente:
-  order: z.enum(['asc', 'desc']).optional().default('asc')
+  order: z
+    .enum(['asc', 'desc'])
+    .nullable()
+    .transform((val) => val ?? 'asc')
 });
 
 export const productIdSchema = z.string().uuid('Invalid product ID format');
 
-// Esquema de validación para los datos del carrito
-export const cartSchema = z.object({
-  userId: z.string().uuid('Invalid user ID format'),
-  items: z.array(
-    z.object({
-      productId: z.string().uuid('Invalid product ID format'),
-      quantity: z.number().min(1, 'Quantity must be at least 1')
-    })
-  )
+export const cartItemSchema = z.object({
+  productId: z.string().uuid('Invalid product ID format'),
+  quantity: z.number().min(1, 'Quantity must be at least 1')
+});
+
+// Esquema para POST (crear carrito)
+export const createCartSchema = z.object({
+  items: z.array(cartItemSchema)
+});
+
+// Esquema para PATCH (actualizar carrito)
+export const updateCartSchema = z.object({
+  items: z.array(cartItemSchema),
+  updateType: z.enum(['set', 'increment'])
 });
 
 export const cartIdSchema = z.string().uuid('Invalid cart ID format');
@@ -81,4 +92,8 @@ export const sendResetEmailSchema = z.object({
 export const resetPasswordSchema = z.object({
   password: z.string().min(6, 'The password must be at least 6 characters long.'),
   token: z.string().min(1, 'Token is required.')
+});
+
+export const removeItemSchema = z.object({
+  productId: z.string().uuid() // Aseguramos que el productId sea un UUID válido
 });
