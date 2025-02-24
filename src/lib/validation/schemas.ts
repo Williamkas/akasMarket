@@ -18,7 +18,10 @@ export const productCreateSchema = z.object({
   price: z.number().positive('Price must be a positive number.'),
   stock: z.number().int().nonnegative('Stock must be a non-negative integer.'),
   categories: z.array(z.string()).min(1, 'At least one category is required.'),
-  images: z.array(z.string().url()).min(1, 'At least one image URL is required.')
+  images: z
+    .array(z.string().url())
+    .min(1, 'At least one image URL is required.')
+    .max(15, 'A product can have up to 15 images.')
 });
 
 export const productsSchema = z.object({

@@ -86,19 +86,24 @@ export async function POST(request: Request) {
     const validation = productCreateSchema.safeParse(body);
     if (!validation.success) return handleError(400, 'Invalid product data', validation.error.errors);
 
-    const { images, ...productData } = validation.data;
+    const { images, categories, ...productData } = validation.data;
+
+    // 📌 Si se pasan categorías, asegurarse de que sean un array de strings
+    if (categories && (!Array.isArray(categories) || categories.some((cat) => typeof cat !== 'string'))) {
+      return handleError(400, 'Invalid categories format');
+    }
 
     // Insertar producto
     const { data: product, error: productError } = await supabase
       .from('products')
-      .insert([{ ...productData, main_image_url: images[0] }])
+      .insert([{ ...productData, main_image_url: images[0], categories }])
       .select()
       .single();
 
     if (productError || !product) return handleError(500, 'Error creating product', productError);
 
     // Insertar imágenes
-    const imageRecords = images.map((url, index) => ({
+    const imageRecords = images.map((url: string, index: number) => ({
       product_id: product.id,
       image_url: url,
       is_primary: index === 0

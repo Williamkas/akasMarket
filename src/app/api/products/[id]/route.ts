@@ -25,7 +25,11 @@ export async function GET(request: NextRequest) {
     }
 
     // 📌 Buscamos el producto en la base de datos.
-    const { data, error } = await supabase.from('products').select('*').eq('id', id).single();
+    const { data, error } = await supabase
+      .from('products')
+      .select('*, product_images(image_url, is_primary)')
+      .eq('id', id)
+      .single();
 
     if (error) {
       return handleError(500, 'Error fetching product', error);
@@ -74,31 +78,38 @@ export async function PATCH(request: NextRequest) {
       return handleError(400, 'Invalid product data', validation.error.errors);
     }
 
-    const { images, ...updateData } = validation.data;
+    const { images, categories, ...updateData } = validation.data;
 
-    // Actualizar producto
+    // 📌 Si se pasan categorías, asegurarse de que sean un array de strings
+    if (categories && (!Array.isArray(categories) || categories.some((cat) => typeof cat !== 'string'))) {
+      return handleError(400, 'Invalid categories format');
+    }
+
+    // 📌 Actualizar producto
     const { data: updatedProduct, error: productError } = await supabase
       .from('products')
-      .update(updateData)
+      .update({ ...updateData, main_image_url: images?.[0], categories })
       .eq('id', id)
       .select()
       .single();
 
     if (productError || !updatedProduct) return handleError(500, 'Error updating product', productError);
 
-    // Si se enviaron nuevas imágenes, se actualiza la tabla
+    // 📌 Si se enviaron nuevas imágenes, se actualiza la tabla
     if (images && images.length > 0) {
+      // Primero eliminamos las imágenes anteriores:
       const { error: deleteImagesError } = await supabase.from('product_images').delete().eq('product_id', id);
       if (deleteImagesError) {
         return handleError(500, 'Error deleting product images', deleteImagesError);
       }
 
-      const newImages = images.map((url, index) => ({
+      const newImages = images.map((url: string, index: number) => ({
         product_id: id,
         image_url: url,
         is_primary: index === 0
       }));
 
+      // Ahora insertamos las nuevas imágenes:
       const { error: imagesError } = await supabase.from('product_images').insert(newImages);
       if (imagesError) {
         return handleError(500, 'Error saving product images', imagesError);
