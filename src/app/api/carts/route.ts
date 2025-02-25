@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
           quantity,
           product:products (
             id,
-            name,
+            title,
             description,
             price,
             stock

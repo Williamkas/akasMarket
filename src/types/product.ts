@@ -1,6 +1,6 @@
 export interface Product {
   id: string;
-  name: string;
+  title: string;
   description: string;
   price: number;
   stock: number;
@@ -12,7 +12,7 @@ export interface ProductQueryParams {
   page: number;
   limit: number;
   search?: string;
-  sortBy: 'name' | 'price';
+  sortBy: 'title' | 'price';
   order: 'asc' | 'desc';
 }
 

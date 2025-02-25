@@ -15,7 +15,7 @@ export async function GET(request: Request) {
     page: searchParams.get('page') ?? '1',
     limit: searchParams.get('limit') ?? '10',
     search: searchParams.get('search') ?? '',
-    sortBy: searchParams.get('sortBy') ?? 'name',
+    sortBy: searchParams.get('sortBy') ?? 'title',
     order: searchParams.get('order') ?? 'asc'
   });
 
@@ -39,7 +39,7 @@ export async function GET(request: Request) {
 
     // 📌 Aplicar búsqueda si hay un término
     if (search) {
-      query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
+      query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
     }
 
     const { data, error, count } = await query;

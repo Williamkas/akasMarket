@@ -13,7 +13,7 @@ export const loginSchema = z.object({
 });
 
 export const productCreateSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters long.'),
+  title: z.string().min(2, 'Title must be at least 2 characters long.'),
   description: z.string().min(10, 'Description must be at least 10 characters.'),
   price: z.number().positive('Price must be a positive number.'),
   stock: z.number().int().nonnegative('Stock must be a non-negative integer.'),
@@ -21,7 +21,10 @@ export const productCreateSchema = z.object({
   images: z
     .array(z.string().url())
     .min(1, 'At least one image URL is required.')
-    .max(15, 'A product can have up to 15 images.')
+    .max(15, 'A product can have up to 15 images.'),
+  brand: z.string().min(2, 'Brand must be at least 2 characters long.'),
+  discount: z.number().min(0, 'Discount must be at least 0%').max(100, 'Discount cannot exceed 100%').default(0),
+  delivery_type: z.enum(['Retiro en sucursal', 'Envío a domicilio'])
 });
 
 export const productsSchema = z.object({
@@ -53,9 +56,9 @@ export const productsSchema = z.object({
     .transform((val) => (val ? val.trim() : '')),
   // Campo por el que ordenamos (nombre o precio)
   sortBy: z
-    .enum(['name', 'price'])
+    .enum(['title', 'price'])
     .nullable()
-    .transform((val) => val ?? 'name'),
+    .transform((val) => val ?? 'title'),
   // Orden ascendente o descendente:
   order: z
     .enum(['asc', 'desc'])
