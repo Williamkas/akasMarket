@@ -33,9 +33,27 @@ export async function POST(request: Request) {
     if (error) {
       return handleError(401, 'Invalid credentials');
     }
-    const response = { user: data.user, accessToken: data.session?.access_token };
 
-    return handleSuccess(200, 'Login successful', response);
+    // 📌 Extraer tokens de la sesión
+    const accessToken = data.session?.access_token;
+    const refreshToken = data.session?.refresh_token;
+
+    if (!accessToken || !refreshToken) {
+      return handleError(500, 'Authentication failed, tokens not received');
+    }
+
+    // 📌 Configurar cookie segura con el refreshToken
+    // Si HttpOnly está activado, la cookie NO puede ser leída con JavaScript (document.cookie).
+    // Si Secure está activado, la cookie solo se enviará en conexiones HTTPS.
+    // Con SameSite=Strict, el navegador solo envía la cookie cuando la petición proviene del mismo sitio.
+    const cookieOptions = {
+      'Set-Cookie': `refreshToken=${refreshToken}; HttpOnly; Secure; Path=/; SameSite=Strict; Max-Age=2592000` // 30 días
+    };
+
+    const response = { user: data.user, accessToken };
+
+    // 📌 Responder con accessToken y datos del usuario
+    return handleSuccess(200, 'Login successful', response, cookieOptions);
   } catch (error) {
     return handleError(500, 'Internal Server Error', error);
   }

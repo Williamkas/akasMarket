@@ -61,15 +61,22 @@ export function handleError(
  * @param status Código de estado HTTP (por defecto 200).
  * @param message Mensaje de éxito.
  * @param data Datos de la respuesta.
+ * @param headers Cabeceras personalizadas (opcional).
  * @returns NextResponse con el resultado formateado.
  */
-export function handleSuccess<T>(status: number = 200, message: string, data: T): NextResponse<SuccessResponse<T>> {
-  return NextResponse.json(
-    {
-      success: true,
-      message,
-      data
-    },
-    { status }
-  );
+export function handleSuccess<T>(
+  status: number = 200,
+  message: string,
+  data: T,
+  headers?: HeadersInit
+): NextResponse<SuccessResponse<T>> {
+  const response = NextResponse.json<SuccessResponse<T>>({ success: true, message, data }, { status });
+
+  if (headers) {
+    Object.entries(headers).forEach(([key, value]) => {
+      response.headers.set(key, value);
+    });
+  }
+
+  return response;
 }
