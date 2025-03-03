@@ -26,48 +26,32 @@ export async function getAuthenticatedUser(request: Request): Promise<
     error: authError
   } = await supabase.auth.getUser(token);
 
-  // 📌 Si hay un error al obtener al usuario, devolver el error.
-  if (authError) {
+  // 📌 Si hay un error al obtener al usuario, devolver el error ó si no se encuentra al usuario, devolver un error.
+  if (authError || !user) {
     return {
       error: true,
-      status: 500,
-      message: authError.message || 'Error fetching user'
+      status: authError ? 500 : 401,
+      message: authError?.message || 'No user is authenticated.'
     };
   }
 
-  // 📌 Si no se encuentra al usuario, devolver un error.
-  if (!user) {
-    return {
-      error: true,
-      status: 401,
-      message: 'No user is authenticated.'
-    };
-  }
-
-  // 📌 Llamar a la función RPC para obtener los datos del usuario desde la base de datos.
-  const { data: userData, error: rpcError } = await supabase.rpc('get_user_by_email', { email: user.email });
-
-  // 📌 Si hay un error al ejecutar la función RPC o no se obtienen datos, devolver un error.
-  if (rpcError || !userData) {
-    return {
-      error: true,
-      status: 500,
-      message: rpcError?.message || 'Error fetching user data'
-    };
+  // 📌 Validar que el usuario tenga un email
+  if (!user.email) {
+    return { error: true, status: 500, message: 'User email is missing or invalid.' };
   }
 
   // 📌 Validamos que metadata tenga un rol y forzamos su tipo
-  const metadata = userData.user_metadata as Record<string, unknown>;
+  const metadata = user.user_metadata as Record<string, unknown>;
   if (typeof metadata.role !== 'string') {
     return { error: true, message: 'User role is missing or invalid.', status: 500 };
   }
 
   // 📌 Formatear los datos del usuario obtenidos.
   const formattedUser = {
-    id: userData.id,
-    email: userData.email,
+    id: user.id,
+    email: user.email,
     metadata: { ...metadata, role: metadata.role },
-    createdAt: userData.created_at
+    createdAt: user.created_at
   };
 
   // 📌 Devolver el usuario formateado si todo salió bien.

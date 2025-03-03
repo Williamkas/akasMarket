@@ -12,7 +12,14 @@ export async function POST() {
       return handleError(500, 'Error logging out', error);
     }
 
-    return handleSuccess(200, 'Successfully logged out!', null);
+    // 📌 Crear la respuesta de éxito
+    const response = handleSuccess(200, 'Successfully logged out!', null);
+
+    // 📌 Expirar cookies de autenticación
+    response.headers.set('Set-Cookie', 'refreshToken=; HttpOnly; Secure; Path=/; Max-Age=0');
+    response.headers.append('Set-Cookie', 'accessToken=; HttpOnly; Secure; Path=/; Max-Age=0');
+
+    return response;
   } catch (error) {
     return handleError(500, 'Internal Server Error', error);
   }

@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase/client';
 import { loginSchema } from '@/lib/validation/schemas';
+import { cookies } from 'next/headers';
 import { handleError, handleSuccess } from '@/utils/apiHelpers';
 
 /**
@@ -7,6 +8,26 @@ import { handleError, handleSuccess } from '@/utils/apiHelpers';
  */
 export async function POST(request: Request) {
   try {
+    // 📌 Leer las cookies del request (accedemos a la cookie del refreshToken) para evitar que usuario haga login estando previanmente logueado.
+    const cookieStore = await cookies();
+    const refreshToken = cookieStore.get('refreshToken')?.value;
+
+    if (refreshToken) {
+      // 📌 Verificar si el refreshToken ya es válido
+      const { data: sessionData, error: refreshError } = await supabase.auth.refreshSession({
+        refresh_token: refreshToken
+      });
+
+      if (sessionData?.session?.access_token) {
+        // Si ya hay un accessToken válido, significa que el usuario ya está logueado
+        return handleError(400, 'User already logged in');
+      }
+
+      if (refreshError) {
+        return handleError(403, 'Invalid refresh token');
+      }
+    }
+    
     const body = await request.json();
 
     // 📌 Validar los datos del cuerpo de la solicitud
@@ -36,9 +57,9 @@ export async function POST(request: Request) {
 
     // 📌 Extraer tokens de la sesión
     const accessToken = data.session?.access_token;
-    const refreshToken = data.session?.refresh_token;
+    const refreshTokenNew = data.session?.refresh_token;
 
-    if (!accessToken || !refreshToken) {
+    if (!accessToken || !refreshTokenNew) {
       return handleError(500, 'Authentication failed, tokens not received');
     }
 
@@ -47,7 +68,7 @@ export async function POST(request: Request) {
     // Si Secure está activado, la cookie solo se enviará en conexiones HTTPS.
     // Con SameSite=Strict, el navegador solo envía la cookie cuando la petición proviene del mismo sitio.
     const cookieOptions = {
-      'Set-Cookie': `refreshToken=${refreshToken}; HttpOnly; Secure; Path=/; SameSite=Strict; Max-Age=2592000` // 30 días
+      'Set-Cookie': `refreshToken=${refreshTokenNew}; HttpOnly; Secure; Path=/; SameSite=Strict; Max-Age=2592000` // 30 días
     };
 
     const response = { user: data.user, accessToken };
