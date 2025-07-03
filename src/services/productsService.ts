@@ -26,17 +26,15 @@ interface GetAllProductsResponse {
   totalPages: number;
 }
 
-export const getAllProducts = async (
-  filters: ProductFilters = {}
-): Promise<GetAllProductsResponse> => {
+export const getAllProducts = async (filters: ProductFilters = {}): Promise<GetAllProductsResponse> => {
   const params = new URLSearchParams({
     page: String(filters.page ?? 1),
     limit: String(filters.limit ?? 10),
     search: filters.search ?? '',
     sortBy: filters.sortBy ?? 'title',
-    order: filters.order ?? 'asc',
+    order: filters.order ?? 'asc'
   });
 
   const response = await api.get(`/api/products?${params.toString()}`);
-  return response.data;
+  return response.data.data;
 };

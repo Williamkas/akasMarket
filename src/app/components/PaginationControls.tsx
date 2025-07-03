@@ -8,6 +8,7 @@ interface PaginationControlsProps {
   onPageChange: (page: number) => void;
   totalCount?: number;
   itemsPerPage?: number;
+  loading?: boolean;
 }
 
 const PaginationControls: React.FC<PaginationControlsProps> = ({
@@ -15,7 +16,8 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
   totalPages,
   onPageChange,
   totalCount = 0,
-  itemsPerPage = 10
+  itemsPerPage = 10,
+  loading = false
 }) => {
   // Generate page numbers to display
   const getPageNumbers = () => {
@@ -83,9 +85,9 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
           {/* Previous button */}
           <button
             onClick={() => onPageChange(currentPage - 1)}
-            disabled={currentPage === 1}
+            disabled={currentPage === 1 || loading}
             className={`inline-flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-              currentPage === 1
+              currentPage === 1 || loading
                 ? 'text-gray-400 cursor-not-allowed bg-gray-50'
                 : 'text-gray-700 bg-white hover:bg-gray-50 border border-gray-300'
             }`}
@@ -105,8 +107,9 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
                 ) : (
                   <button
                     onClick={() => onPageChange(page as number)}
+                    disabled={loading}
                     className={`inline-flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                      currentPage === page
+                      currentPage === page || loading
                         ? 'bg-blue-600 text-white border border-blue-600'
                         : 'text-gray-700 bg-white hover:bg-gray-50 border border-gray-300'
                     }`}
@@ -128,9 +131,9 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
           {/* Next button */}
           <button
             onClick={() => onPageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
+            disabled={currentPage === totalPages || loading}
             className={`inline-flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-              currentPage === totalPages
+              currentPage === totalPages || loading
                 ? 'text-gray-400 cursor-not-allowed bg-gray-50'
                 : 'text-gray-700 bg-white hover:bg-gray-50 border border-gray-300'
             }`}
@@ -158,6 +161,7 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
                 onPageChange(page);
               }
             }}
+            disabled={loading}
             className='w-16 px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent'
           />
           <span className='text-sm text-gray-600'>of {totalPages}</span>

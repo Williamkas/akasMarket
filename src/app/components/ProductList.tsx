@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 interface Product {
   id: string;
@@ -16,11 +17,24 @@ interface ProductListProps {
   products: Product[];
   loading?: boolean;
   totalCount?: number;
+  error?: string | null;
 }
 
 const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
+  const router = useRouter();
+  const handleClick = () => {
+    router.push(`/products/${product.id}`);
+  };
   return (
-    <div className='bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300 group'>
+    <div
+      className='bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300 group cursor-pointer'
+      onClick={handleClick}
+      role='button'
+      tabIndex={0}
+      onKeyPress={(e) => {
+        if (e.key === 'Enter') handleClick();
+      }}
+    >
       {/* Product Image */}
       <div className='relative h-48 bg-gray-100 overflow-hidden'>
         <Image
@@ -127,9 +141,18 @@ const ProductListSkeleton: React.FC = () => {
   );
 };
 
-const ProductList: React.FC<ProductListProps> = ({ products, loading = false, totalCount = 0 }) => {
+const ProductList: React.FC<ProductListProps> = ({ products, loading = false, totalCount = 0, error }) => {
   if (loading) {
     return <ProductListSkeleton />;
+  }
+
+  if (error) {
+    return (
+      <div className='bg-white rounded-lg border border-red-300 p-12 text-center text-red-700'>
+        <h3 className='text-lg font-semibold mb-2'>Error al cargar productos</h3>
+        <p>{error}</p>
+      </div>
+    );
   }
 
   if (!products || products.length === 0) {

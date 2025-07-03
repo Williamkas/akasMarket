@@ -19,6 +19,7 @@ interface Pagination {
 interface ProductStore {
   products: Product[];
   loading: boolean;
+  error: string | null;
   filters: ProductFilters;
   pagination: Pagination;
   setFilters: (filters: Partial<ProductFilters>) => void;
@@ -28,6 +29,7 @@ interface ProductStore {
 export const useProductStore = create<ProductStore>((set, get) => ({
   products: [],
   loading: false,
+  error: null,
   filters: {
     page: 1,
     limit: 12,
@@ -46,7 +48,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     }));
   },
   fetchProducts: async () => {
-    set({ loading: true });
+    set({ loading: true, error: null });
     try {
       const { filters } = get();
       const response = await getAllProducts(filters);
@@ -56,11 +58,12 @@ export const useProductStore = create<ProductStore>((set, get) => ({
           currentPage: response.page,
           totalPages: response.totalPages,
           totalCount: response.count
-        }
+        },
+        error: null
       });
-    } catch (error) {
-      set({ products: [] });
-      // Puedes agregar manejo de error global aquí
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Error fetching products';
+      set({ products: [], error: message });
     } finally {
       set({ loading: false });
     }

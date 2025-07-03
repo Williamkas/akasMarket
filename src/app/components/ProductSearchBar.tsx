@@ -7,11 +7,13 @@ interface ProductSearchBarProps {
   initialValue?: string;
 }
 
-const ProductSearchBar: React.FC<ProductSearchBarProps> = ({ 
-  onSearchChange, 
-  initialValue = '' 
-}) => {
+const ProductSearchBar: React.FC<ProductSearchBarProps> = ({ onSearchChange, initialValue = '' }) => {
   const [searchTerm, setSearchTerm] = useState(initialValue);
+
+  // Sincronizar searchTerm con initialValue si cambia desde fuera
+  useEffect(() => {
+    setSearchTerm(initialValue);
+  }, [initialValue]);
 
   // Debounce search to avoid too many API calls
   useEffect(() => {
@@ -35,7 +37,7 @@ const ProductSearchBar: React.FC<ProductSearchBarProps> = ({
         placeholder='Search for products...'
         className='w-full pl-4 pr-20 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 placeholder-gray-500'
       />
-      
+
       <div className='absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-1'>
         {/* Clear button */}
         {searchTerm && (
@@ -49,14 +51,16 @@ const ProductSearchBar: React.FC<ProductSearchBarProps> = ({
             </svg>
           </button>
         )}
-        
+
         {/* Search button */}
-        <button 
-          className='bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition-colors'
-          title='Search'
-        >
+        <button className='bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition-colors' title='Search'>
           <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' />
+            <path
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              strokeWidth={2}
+              d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
+            />
           </svg>
         </button>
       </div>

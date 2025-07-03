@@ -10,7 +10,7 @@ import PaginationControls from './components/PaginationControls';
 import { useProductStore } from '../store/useProductStore';
 
 export default function Home() {
-  const { products, loading, filters, pagination, setFilters, fetchProducts } = useProductStore();
+  const { products, loading, filters, pagination, setFilters, fetchProducts, error } = useProductStore();
 
   // Effect to fetch products when filters change
   useEffect(() => {
@@ -73,6 +73,13 @@ export default function Home() {
           </p>
         </div>
 
+        {/* Error feedback visual */}
+        {error && (
+          <div className='mb-6 p-4 bg-red-100 border border-red-300 text-red-800 rounded'>
+            <strong>Error:</strong> {error}
+          </div>
+        )}
+
         <div className='flex flex-col lg:flex-row gap-8'>
           {/* Sidebar Filters */}
           <aside className='w-full lg:w-1/4'>
@@ -94,7 +101,7 @@ export default function Home() {
             />
 
             {/* Products List */}
-            <ProductList products={products} loading={loading} totalCount={pagination.totalCount} />
+            <ProductList products={products} loading={loading} totalCount={pagination.totalCount} error={error} />
 
             {/* Pagination */}
             {!loading && products.length > 0 && (
