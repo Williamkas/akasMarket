@@ -30,8 +30,7 @@ export default function LoginPage() {
       if (!response.ok) {
         throw new Error(result.message || 'Error al iniciar sesión');
       }
-      // TODO: Guardar el token en una cookie.
-      localStorage.setItem('supabase_token', result.data.accessToken);
+      // TODO: Acá deberíamos guardar el token en una cookie y que luego podamos leer en los fetch para el carrito o post, patch, delete de productos.
       toast.success('✅ Inicio de sesión exitoso');
 
       setTimeout(() => {
