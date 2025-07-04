@@ -134,11 +134,14 @@ export default function ProductDetail() {
             {/* Product Info */}
             <div className='space-y-6'>
               <div>
-                <div className='flex items-center gap-2 mb-2'>
-                  <h1 className='text-3xl font-bold text-gray-900'>{product.title}</h1>
+                {/* Fila con tag y favoritos */}
+                <div className='flex items-center justify-between mb-2'>
+                  <span className='bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium'>
+                    {product.status === 'new' ? 'Nuevo' : 'Usado'}
+                  </span>
                   <button
                     type='button'
-                    className='ml-2 bg-white rounded-full p-1 shadow'
+                    className='bg-white rounded-full p-1 shadow'
                     aria-label='Agregar a favoritos'
                     onClick={() => {}}
                   >
@@ -152,11 +155,7 @@ export default function ProductDetail() {
                     </svg>
                   </button>
                 </div>
-                <div className='flex flex-wrap gap-2 mb-2'>
-                  <span className='bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium'>
-                    {product.status === 'new' ? 'Nuevo' : 'Usado'}
-                  </span>
-                </div>
+                <h1 className='text-3xl font-bold text-gray-900'>{product.title}</h1>
               </div>
 
               <div>
