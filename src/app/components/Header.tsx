@@ -1,8 +1,37 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import LogoAkas from './LogoAkas';
+import { useCartStore } from '../../store/useCartStore';
+
+const CartIcon = () => (
+  <svg
+    xmlns='http://www.w3.org/2000/svg'
+    fill='none'
+    viewBox='0 0 24 24'
+    strokeWidth={1.5}
+    stroke='currentColor'
+    className='w-7 h-7'
+  >
+    <path
+      strokeLinecap='round'
+      strokeLinejoin='round'
+      d='M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437m0 0L7.5 15.75A2.25 2.25 0 009.664 18h7.672a2.25 2.25 0 002.164-1.75l1.286-6.429A1.125 1.125 0 0019.75 8.25H6.272m-1.166-2.978L4.5 4.5m0 0L3.75 3m.75 1.5h16.5'
+    />
+    <circle cx='9' cy='20' r='1.5' />
+    <circle cx='17' cy='20' r='1.5' />
+  </svg>
+);
 
 const Header: React.FC = () => {
+  const cartCount = useCartStore((state) => state.getCartCount());
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <header className='bg-white shadow-sm border-b border-gray-200'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
@@ -24,18 +53,13 @@ const Header: React.FC = () => {
           <div className='flex items-center space-x-4'>
             {/* Cart */}
             <Link href='/cart' className='relative p-2 text-gray-600 hover:text-gray-900'>
-              <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={2}
-                  d='M3 3h2l.4 2M7 13h10l4-8H5.4m-2.4 0L5 7m2 6v8a2 2 0 002 2h8a2 2 0 002-2v-8M7 13l-2-6m0 0h16'
-                />
-              </svg>
-              {/* Cart badge */}
-              <span className='absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center'>
-                0
-              </span>
+              <CartIcon />
+              {/* Cart badge - only show when count > 0 and mounted */}
+              {mounted && cartCount > 0 && (
+                <span className='absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center'>
+                  {cartCount}
+                </span>
+              )}
             </Link>
 
             {/* Profile/Login */}

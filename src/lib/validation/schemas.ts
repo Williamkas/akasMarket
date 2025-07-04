@@ -56,7 +56,7 @@ export const productsSchema = z.object({
     .transform((val) => (val ? val.trim() : '')),
   // Campo por el que ordenamos (nombre o precio)
   sortBy: z
-    .enum(['title', 'price'])
+    .enum(['title', 'price', 'created_at'])
     .nullable()
     .transform((val) => val ?? 'title'),
   // Orden ascendente o descendente:
