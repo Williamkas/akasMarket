@@ -5,9 +5,14 @@ import React, { useState, useEffect } from 'react';
 interface ProductSearchBarProps {
   onSearchChange: (search: string) => void;
   initialValue?: string;
+  placeholder?: string;
 }
 
-const ProductSearchBar: React.FC<ProductSearchBarProps> = ({ onSearchChange, initialValue = '' }) => {
+const ProductSearchBar: React.FC<ProductSearchBarProps> = ({
+  onSearchChange,
+  initialValue = '',
+  placeholder = 'Buscar...'
+}) => {
   const [searchTerm, setSearchTerm] = useState(initialValue);
 
   // Sincronizar searchTerm con initialValue si cambia desde fuera
@@ -34,7 +39,7 @@ const ProductSearchBar: React.FC<ProductSearchBarProps> = ({ onSearchChange, ini
         type='text'
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        placeholder='Search for products...'
+        placeholder={placeholder}
         className='w-full pl-4 pr-20 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 placeholder-gray-500'
       />
 

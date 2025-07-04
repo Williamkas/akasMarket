@@ -5,6 +5,7 @@ import { Toaster } from 'sonner';
 import './globals.css';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import CartToast from './components/CartToast';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -26,11 +27,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang='en'>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 text-gray-900 min-h-screen flex flex-col`}
       >
+        <CartToast />
         <Suspense fallback='Loading...'>
           <Header />
           <main className='flex-1'>{children}</main>

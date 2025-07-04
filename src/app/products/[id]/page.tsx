@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { getProductDetails } from '@/services/productService';
 import { useCartStore } from '@/store/useCartStore';
 import type { Product } from '@/services/productsService';
+import CustomDropdown from '@/app/components/CustomDropdown';
 
 const BackButton = () => (
   <Link href='/' className='inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors mb-6'>
@@ -73,16 +74,12 @@ export default function ProductDetail() {
     }
   };
 
-  const handleQuantityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setQuantity(Number(e.target.value));
-  };
-
   if (loading) {
     return (
       <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
         <div className='text-center'>
           <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto'></div>
-          <p className='mt-4 text-gray-600'>Loading product...</p>
+          <p className='mt-4 text-gray-600'>Cargando producto...</p>
         </div>
       </div>
     );
@@ -113,6 +110,9 @@ export default function ProductDetail() {
   const availableStock = maxStock - (cartItem?.quantity || 0);
   const canAdd = availableStock > 0;
 
+  // Determinar si hay categorías válidas
+  const validCategories = product.categories?.filter((cat) => cat && cat !== 'Uncategorized') || [];
+
   return (
     <div className='min-h-screen bg-gray-50'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
@@ -134,45 +134,68 @@ export default function ProductDetail() {
             {/* Product Info */}
             <div className='space-y-6'>
               <div>
-                <h1 className='text-3xl font-bold text-gray-900 mb-2'>{product.title}</h1>
-                <p className='text-2xl font-semibold text-blue-600'>${product.price.toFixed(2)}</p>
+                <div className='flex items-center gap-2 mb-2'>
+                  <h1 className='text-3xl font-bold text-gray-900'>{product.title}</h1>
+                  <button
+                    type='button'
+                    className='ml-2 bg-white rounded-full p-1 shadow'
+                    aria-label='Agregar a favoritos'
+                    onClick={() => {}}
+                  >
+                    <svg className='w-7 h-7 text-black' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                      <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth={2}
+                        d='M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 21.364l-7.682-7.682a4.5 4.5 0 010-6.364z'
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <div className='flex flex-wrap gap-2 mb-2'>
+                  <span className='bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium'>
+                    {product.status === 'new' ? 'Nuevo' : 'Usado'}
+                  </span>
+                </div>
               </div>
 
               <div>
-                <h3 className='text-lg font-semibold text-gray-900 mb-2'>Description</h3>
+                <h3 className='text-lg font-semibold text-gray-900 mb-2'>Descripción</h3>
                 <p className='text-gray-600 leading-relaxed'>{product.description}</p>
               </div>
 
-              {product.categories && product.categories.length > 0 && (
+              {validCategories.length > 0 && (
                 <div>
-                  <h3 className='text-lg font-semibold text-gray-900 mb-2'>Categories</h3>
+                  <h3 className='text-lg font-semibold text-gray-900 mb-2'>Categorías</h3>
                   <div className='flex flex-wrap gap-2'>
-                    {product.categories
-                      .filter((cat) => cat && cat !== 'Uncategorized')
-                      .map((category, index) => (
-                        <span key={index} className='px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm'>
-                          {category}
-                        </span>
-                      ))}
+                    {validCategories.map((category, index) => (
+                      <span key={index} className='px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm'>
+                        {category}
+                      </span>
+                    ))}
                   </div>
                 </div>
               )}
 
+              {/* Sección de Envío */}
+              <div className='mt-4'>
+                <h3 className='text-lg font-semibold text-gray-900 mb-2'>Envío:</h3>
+                <span className='bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full font-medium'>
+                  {product.delivery_type}
+                </span>
+              </div>
+
               {/* Cantidad y stock */}
               <div className='mb-2 flex items-center gap-2'>
                 <span className='text-gray-700'>Cantidad:</span>
-                <select
-                  className='border border-gray-300 rounded px-2 py-1 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500'
-                  value={quantity}
-                  onChange={handleQuantityChange}
-                  disabled={!canAdd}
-                >
-                  {Array.from({ length: Math.min(availableStock, 10) }, (_, i) => i + 1).map((val) => (
-                    <option key={val} value={val}>
-                      {val} unidad{val > 1 ? 'es' : ''}
-                    </option>
-                  ))}
-                </select>
+                <div className='w-32'>
+                  <CustomDropdown
+                    options={Array.from({ length: Math.min(availableStock, 10) }, (_, i) => i + 1)}
+                    value={quantity}
+                    onChange={setQuantity}
+                    renderOption={(val) => `${val} unidad${val > 1 ? 'es' : ''}`}
+                  />
+                </div>
                 <span className='text-xs text-gray-500'>
                   {availableStock > 0 ? `(+${availableStock} disponibles)` : '(Sin stock)'}
                 </span>

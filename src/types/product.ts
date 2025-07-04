@@ -6,13 +6,17 @@ export interface Product {
   stock: number;
   imageUrl: string;
   created_at: string;
+  categories: string[];
+  main_image_url: string;
+  status: 'new' | 'old';
+  delivery_type: 'Envío a domicilio' | 'Retiro en sucursal';
 }
 
 export interface ProductQueryParams {
   page: number;
   limit: number;
   search?: string;
-  sortBy: 'title' | 'price';
+  sortBy: 'title' | 'price' | 'created_at';
   order: 'asc' | 'desc';
   minPrice?: number;
   maxPrice?: number;

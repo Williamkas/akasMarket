@@ -1,14 +1,6 @@
 import { create } from 'zustand';
 import { getAllProducts, type ProductFilters } from '../services/productsService';
-
-interface Product {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  categories: string[];
-  main_image_url: string;
-}
+import type { Product } from '../types/product';
 
 interface Pagination {
   currentPage: number;

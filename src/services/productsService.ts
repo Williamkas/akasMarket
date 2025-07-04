@@ -20,8 +20,9 @@ export interface Product {
   main_image_url: string;
   stock: number;
   imageUrl: string;
-  created_at?: string;
-  // Agrega más campos si es necesario
+  created_at: string;
+  status: 'new' | 'old';
+  delivery_type: 'Envío a domicilio' | 'Retiro en sucursal';
 }
 
 interface GetAllProductsResponse {
