@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { useFavoritesStore } from '../../store/useFavoritesStore';
 
 interface ProductCardProps {
   id: string;
@@ -14,6 +15,18 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ id, title, price, imageUrl, status, delivery_type, onFavorite }) => {
   const [hovered, setHovered] = useState(false);
+  const { isFavorite, addFavorite, removeFavorite } = useFavoritesStore();
+  const favorite = isFavorite(id);
+
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (favorite) {
+      removeFavorite(id);
+    } else {
+      addFavorite(id);
+    }
+    onFavorite(id);
+  };
 
   return (
     <Link
@@ -33,16 +46,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ id, title, price, imageUrl, s
         {/* Icono de favorito solo en hover */}
         <button
           type='button'
-          onClick={(e) => {
-            e.preventDefault();
-            onFavorite(id);
-          }}
+          onClick={handleFavoriteClick}
           className={`absolute top-2 right-2 bg-white rounded-full p-1 shadow transition-opacity duration-200 ${
             hovered ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
           }`}
           aria-label='Agregar a favoritos'
         >
-          <svg className='w-6 h-6 text-black' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+          <svg className='w-6 h-6' fill={favorite ? 'black' : 'none'} stroke='currentColor' viewBox='0 0 24 24'>
             <path
               strokeLinecap='round'
               strokeLinejoin='round'

@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import LogoAkas from './LogoAkas';
 import { useCartStore } from '../../store/useCartStore';
+import ProductSearchBar from './ProductSearchBar';
+import { useProductStore } from '../../store/useProductStore';
 
 const CartIcon = () => (
   <svg
@@ -26,16 +28,21 @@ const CartIcon = () => (
 
 const Header: React.FC = () => {
   const cartCount = useCartStore((state) => state.getCartCount());
+  const { filters, setFilters } = useProductStore();
   const [mounted, setMounted] = useState(false);
+
+  const handleSearchChange = (search: string) => {
+    setFilters({ search, page: 1 });
+  };
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   return (
-    <header className='bg-white shadow-sm border-b border-gray-200'>
+    <header className='bg-[#0052cc] text-white shadow-sm border-b border-gray-200'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-        <div className='flex justify-between items-center h-16'>
+        <div className='flex flex-col sm:flex-row justify-between items-center h-24 gap-4'>
           {/* Logo */}
           <div className='flex items-center'>
             <Link href='/' className='flex items-center'>
@@ -45,14 +52,23 @@ const Header: React.FC = () => {
               >
                 <LogoAkas width={28} height={28} />
               </span>
-              <h1 className='text-xl font-semibold text-gray-900'>Akas</h1>
+              <h1 className='text-xl font-semibold text-white'>Akas</h1>
             </Link>
+          </div>
+
+          {/* Buscador de productos */}
+          <div className='w-full max-w-xl'>
+            <ProductSearchBar
+              onSearchChange={handleSearchChange}
+              initialValue={filters.search || ''}
+              placeholder='Buscar productos...'
+            />
           </div>
 
           {/* Right side actions */}
           <div className='flex items-center space-x-4'>
             {/* Cart */}
-            <Link href='/cart' className='relative p-2 text-gray-600 hover:text-gray-900'>
+            <Link href='/cart' className='relative p-2 text-white hover:text-gray-200'>
               <CartIcon />
               {/* Cart badge - only show when count > 0 and mounted */}
               {mounted && cartCount > 0 && (
@@ -64,7 +80,7 @@ const Header: React.FC = () => {
 
             {/* Profile/Login */}
             <Link href='/api/auth/logout'>
-              <button className='bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium'>
+              <button className='bg-white text-[#0052cc] px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors font-medium'>
                 Perfil
               </button>
             </Link>

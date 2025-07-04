@@ -7,6 +7,8 @@ import { getProductDetails } from '@/services/productService';
 import { useCartStore } from '@/store/useCartStore';
 import type { Product } from '@/services/productsService';
 import CustomDropdown from '@/app/components/CustomDropdown';
+import { useFavoritesStore } from '@/store/useFavoritesStore';
+import Image from 'next/image';
 
 const BackButton = () => (
   <Link href='/' className='inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors mb-6'>
@@ -28,6 +30,8 @@ export default function ProductDetail() {
 
   const { addToCart, items } = useCartStore();
   const cartItem = items.find((item) => item.product.id === productId);
+  const { isFavorite, addFavorite, removeFavorite } = useFavoritesStore();
+  const favorite = isFavorite(productId);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -71,6 +75,14 @@ export default function ProductDetail() {
         addToCart(product);
       }
       router.push('/cart');
+    }
+  };
+
+  const handleFavoriteClick = () => {
+    if (favorite) {
+      removeFavorite(productId);
+    } else {
+      addFavorite(productId);
     }
   };
 
@@ -123,9 +135,11 @@ export default function ProductDetail() {
             {/* Product Image */}
             <div className='space-y-4'>
               <div className='aspect-w-1 aspect-h-1 w-full'>
-                <img
-                  src={product.main_image_url}
+                <Image
+                  src={product.main_image_url || '/file.svg'}
                   alt={product.title}
+                  width={600}
+                  height={600}
                   className='w-full h-full object-cover rounded-lg'
                 />
               </div>
@@ -143,9 +157,14 @@ export default function ProductDetail() {
                     type='button'
                     className='bg-white rounded-full p-1 shadow'
                     aria-label='Agregar a favoritos'
-                    onClick={() => {}}
+                    onClick={handleFavoriteClick}
                   >
-                    <svg className='w-7 h-7 text-black' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <svg
+                      className='w-8 h-8'
+                      fill={favorite ? 'black' : 'none'}
+                      stroke='currentColor'
+                      viewBox='0 0 24 24'
+                    >
                       <path
                         strokeLinecap='round'
                         strokeLinejoin='round'

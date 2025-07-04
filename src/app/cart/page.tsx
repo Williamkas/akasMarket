@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useCartStore } from '@/store/useCartStore';
 import CustomDropdown from '../components/CustomDropdown';
+import Image from 'next/image';
 
 const CartPage: React.FC = () => {
   const router = useRouter();
@@ -55,7 +56,13 @@ const CartPage: React.FC = () => {
             <ul className='divide-y divide-gray-200'>
               {items.map(({ product, quantity }) => (
                 <li key={product.id} className='flex items-center py-4 gap-4'>
-                  <img src={product.main_image_url} alt={product.title} className='w-20 h-20 object-cover rounded' />
+                  <Image
+                    src={product.main_image_url || '/file.svg'}
+                    alt={product.title}
+                    width={80}
+                    height={80}
+                    className='w-20 h-20 object-cover rounded'
+                  />
                   <div className='flex-1'>
                     <h2 className='font-semibold text-gray-900'>{product.title}</h2>
                     <p className='text-gray-500 text-sm'>${product.price.toFixed(2)} c/u</p>

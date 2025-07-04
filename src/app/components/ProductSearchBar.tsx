@@ -1,51 +1,31 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
 interface ProductSearchBarProps {
-  onSearchChange: (search: string) => void;
-  initialValue?: string;
+  value: string;
+  onChange: (search: string) => void;
   placeholder?: string;
 }
 
-const ProductSearchBar: React.FC<ProductSearchBarProps> = ({
-  onSearchChange,
-  initialValue = '',
-  placeholder = 'Buscar...'
-}) => {
-  const [searchTerm, setSearchTerm] = useState(initialValue);
-
-  // Sincronizar searchTerm con initialValue si cambia desde fuera
-  useEffect(() => {
-    setSearchTerm(initialValue);
-  }, [initialValue]);
-
-  // Debounce search to avoid too many API calls
-  useEffect(() => {
-    const delayedSearch = setTimeout(() => {
-      onSearchChange(searchTerm);
-    }, 300);
-
-    return () => clearTimeout(delayedSearch);
-  }, [searchTerm, onSearchChange]);
-
+const ProductSearchBar: React.FC<ProductSearchBarProps> = ({ value, onChange, placeholder = 'Buscar...' }) => {
   const handleClear = () => {
-    setSearchTerm('');
+    onChange('');
   };
 
   return (
     <div className='relative'>
       <input
         type='text'
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className='w-full pl-4 pr-20 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 placeholder-gray-500'
       />
 
       <div className='absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-1'>
         {/* Clear button */}
-        {searchTerm && (
+        {value && (
           <button
             onClick={handleClear}
             className='text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors'

@@ -2,12 +2,21 @@
 
 import React, { useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import ProductSearchBar from './components/ProductSearchBar';
 import ProductSortOptions from './components/ProductSortOptions';
 import ProductFilters from './components/ProductFilters';
 import PaginationControls from './components/PaginationControls';
 import { useProductStore } from '../store/useProductStore';
 import ProductCard from './components/ProductCard';
+
+// Skeleton para cards
+const ProductCardSkeleton = () => (
+  <div className='animate-pulse bg-white p-4 rounded-lg shadow flex flex-col'>
+    <div className='bg-gray-200 h-48 w-full rounded mb-4'></div>
+    <div className='h-4 bg-gray-200 rounded w-3/4 mb-2'></div>
+    <div className='h-3 bg-gray-100 rounded w-1/2 mb-2'></div>
+    <div className='h-4 bg-gray-200 rounded w-1/3'></div>
+  </div>
+);
 
 export default function Home() {
   const { products, loading, filters, pagination, setFilters, fetchProducts, error } = useProductStore();
@@ -17,14 +26,6 @@ export default function Home() {
     fetchProducts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
-
-  // Handle search change
-  const handleSearchChange = useCallback(
-    (search: string) => {
-      setFilters({ search, page: 1 });
-    },
-    [setFilters]
-  );
 
   // Handle sort change
   const handleSortChange = useCallback(
@@ -74,7 +75,7 @@ export default function Home() {
   }, [products]);
 
   return (
-    <div className='min-h-screen bg-gray-50'>
+    <div className='min-h-screen bg-gray-100'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
         {/* Breadcrumb */}
         <nav className='flex items-center space-x-2 text-sm text-gray-600 mb-6'>
@@ -88,16 +89,18 @@ export default function Home() {
           <span className='text-gray-900 font-medium'>Productos</span>
         </nav>
 
-        {/* Results count */}
-        <div className='mb-6'>
-          <h1 className='text-2xl font-bold text-gray-900 mb-2'>Productos</h1>
-          <p className='text-gray-600'>
-            {loading
-              ? 'Cargando productos...'
-              : `${pagination.totalCount} resultado${pagination.totalCount !== 1 ? 's' : ''} encontrado${
-                  pagination.totalCount !== 1 ? 's' : ''
-                }`}
-          </p>
+        {/* Título y buscador alineados */}
+        <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4'>
+          <div>
+            <h1 className='text-2xl font-bold text-gray-900 mb-1 sm:mb-0'>Productos</h1>
+            <p className='text-gray-600'>
+              {loading
+                ? 'Cargando productos...'
+                : `${pagination.totalCount} resultado${pagination.totalCount !== 1 ? 's' : ''} encontrado${
+                    pagination.totalCount !== 1 ? 's' : ''
+                  }`}
+            </p>
+          </div>
         </div>
 
         {/* Error feedback visual */}
@@ -107,7 +110,7 @@ export default function Home() {
           </div>
         )}
 
-        <div className='flex flex-col lg:flex-row gap-8'>
+        <div className='flex flex-col lg:flex-row gap-8 items-start'>
           {/* Sidebar Filters */}
           <aside className='w-full lg:w-[330px]'>
             <div className='sticky top-4 space-y-6'>
@@ -123,21 +126,28 @@ export default function Home() {
 
           {/* Main Content */}
           <section className='w-full lg:w-3/4 space-y-6'>
-            {/* Search Bar */}
-            <ProductSearchBar
-              onSearchChange={handleSearchChange}
-              initialValue={filters.search}
-              placeholder='Buscar productos...'
-            />
-
             {/* Products List */}
             {loading ? (
-              <div className='bg-white p-8 rounded-lg shadow text-center text-gray-500'>Cargando productos...</div>
+              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <ProductCardSkeleton key={i} />
+                ))}
+              </div>
             ) : error ? (
               <div className='bg-white p-8 rounded-lg shadow text-center text-red-500'>{error}</div>
-            ) : products.length === 0 ? (
+            ) : products.length === 0 &&
+              (filters.search ||
+                filters.minPrice ||
+                filters.maxPrice ||
+                (filters.categories && filters.categories.length > 0)) ? (
               <div className='bg-white p-8 rounded-lg shadow text-center text-gray-500'>
                 No se encontraron productos. Prueba ajustando tu búsqueda o los filtros.
+              </div>
+            ) : products.length === 0 ? (
+              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <ProductCardSkeleton key={i} />
+                ))}
               </div>
             ) : (
               <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
