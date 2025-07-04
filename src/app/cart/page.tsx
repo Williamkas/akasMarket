@@ -36,7 +36,7 @@ const CartPage: React.FC = () => {
   }
 
   return (
-    <div className='min-h-screen bg-gray-50'>
+    <div className='min-h-screen'>
       <div className='max-w-3xl mx-auto px-4 py-8'>
         {/* Botón Volver sobre fondo gris general, sin div extra */}
         <button
@@ -48,11 +48,6 @@ const CartPage: React.FC = () => {
           </svg>
           Volver
         </button>
-        {/* Encabezado */}
-        <div className='flex items-center mb-8'>
-          <h1 className='text-2xl font-bold text-gray-900 mb-4'>Mi Carrito</h1>
-        </div>
-
         {/* Lista de productos */}
         {items.length === 0 ? (
           <div className='bg-white p-8 rounded-lg shadow text-center text-gray-500'>
