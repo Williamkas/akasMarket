@@ -1,52 +1,40 @@
 'use client';
 
 import React from 'react';
-import CustomDropdown from '@/app/components/CustomDropdown';
+import { useProductStore } from '../../store/useProductStore';
+import CustomDropdown from './CustomDropdown';
 
-interface SortOption {
-  value: string;
-  label: string;
-  sortBy: string;
-  order: 'asc' | 'desc';
-}
+type SortOption = { label: string; value: { sortBy: string; order: 'asc' | 'desc' } };
 
-interface ProductSortOptionsProps {
-  onSortChange: (sortBy: string, order: 'asc' | 'desc') => void;
-  currentSort?: string;
-  currentOrder?: 'asc' | 'desc';
-  label?: string;
-}
-
-const sortOptions: SortOption[] = [
-  { value: 'title-asc', label: 'Nombre (A-Z)', sortBy: 'title', order: 'asc' },
-  { value: 'title-desc', label: 'Nombre (Z-A)', sortBy: 'title', order: 'desc' },
-  { value: 'price-asc', label: 'Precio (menor a mayor)', sortBy: 'price', order: 'asc' },
-  { value: 'price-desc', label: 'Precio (mayor a menor)', sortBy: 'price', order: 'desc' },
-  { value: 'created_at-desc', label: 'Más nuevos primero', sortBy: 'created_at', order: 'desc' },
-  { value: 'created_at-asc', label: 'Más antiguos primero', sortBy: 'created_at', order: 'asc' }
+const SORT_OPTIONS: SortOption[] = [
+  { label: 'Más relevantes', value: { sortBy: 'created_at', order: 'desc' } },
+  { label: 'Menor precio', value: { sortBy: 'price', order: 'asc' } },
+  { label: 'Mayor precio', value: { sortBy: 'price', order: 'desc' } },
+  { label: 'Nombre (A-Z)', value: { sortBy: 'title', order: 'asc' } },
+  { label: 'Nombre (Z-A)', value: { sortBy: 'title', order: 'desc' } }
 ];
 
-const ProductSortOptions: React.FC<ProductSortOptionsProps> = ({
-  onSortChange,
-  currentSort = 'title',
-  currentOrder = 'asc',
-  label
-}) => {
-  return (
-    <div className='flex items-center justify-between bg-white p-4 rounded-lg border border-gray-200'>
-      <div className='flex items-center space-x-2'>
-        <span className='text-gray-700 font-medium'>{label || 'Ordenar por:'}</span>
-      </div>
+const ProductSortOptions: React.FC<{ label?: string }> = ({ label }) => {
+  const { filters, setFilters, fetchProducts } = useProductStore();
+  const current: SortOption =
+    SORT_OPTIONS.find((opt) => opt.value.sortBy === filters.sortBy && opt.value.order === filters.order) ||
+    SORT_OPTIONS[0];
 
-      <div className='relative w-48'>
-        <CustomDropdown
-          options={sortOptions}
-          value={sortOptions.find((o) => o.sortBy === currentSort && o.order === currentOrder) || sortOptions[0]}
-          onChange={(opt) => onSortChange(opt.sortBy, opt.order)}
-          renderOption={(opt) => opt.label}
-          getKey={(opt) => opt.value}
-        />
-      </div>
+  const handleChange = (option: SortOption) => {
+    setFilters({ sortBy: option.value.sortBy, order: option.value.order, page: 1 });
+    fetchProducts();
+  };
+
+  return (
+    <div className='bg-white p-4 rounded-lg border border-gray-200 flex flex-col gap-2'>
+      <span className='text-gray-700 font-medium mb-1'>{label || 'Ordenar por:'}</span>
+      <CustomDropdown
+        options={SORT_OPTIONS}
+        value={current}
+        onChange={handleChange}
+        renderOption={(opt) => opt.label}
+        getKey={(opt) => opt.label}
+      />
     </div>
   );
 };

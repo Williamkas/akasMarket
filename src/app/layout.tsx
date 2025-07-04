@@ -3,7 +3,6 @@ import { Suspense } from 'react';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { Toaster } from 'sonner';
 import './globals.css';
-import Header from './components/Header';
 import Footer from './components/Footer';
 import CartToast from './components/CartToast';
 
@@ -34,7 +33,6 @@ export default function RootLayout({
       >
         <CartToast />
         <Suspense fallback='Loading...'>
-          <Header />
           <main className='flex-1'>{children}</main>
           <Footer />
           <Toaster

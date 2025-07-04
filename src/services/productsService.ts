@@ -1,4 +1,5 @@
 import api from './apiServices';
+import { isServer } from '../utils/isServer';
 
 export interface ProductFilters {
   page?: number;
@@ -45,6 +46,18 @@ export const getAllProducts = async (filters: ProductFilters = {}): Promise<GetA
     ...(filters.categories && filters.categories.length > 0 ? { categories: filters.categories.join(',') } : {})
   });
 
-  const response = await api.get(`/api/products?${params.toString()}`);
-  return response.data.data;
+  if (isServer()) {
+    // Usar fetch con URL absoluta en server-side
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const res = await fetch(`${baseUrl}/api/products?${params.toString()}`);
+    if (!res.ok) {
+      throw new Error(`API error: ${res.status} ${res.statusText}`);
+    }
+    const data = await res.json();
+    return data.data;
+  } else {
+    // Usar axios en client-side
+    const response = await api.get(`/api/products?${params.toString()}`);
+    return response.data.data;
+  }
 };

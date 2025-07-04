@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import LogoAkas from './LogoAkas';
 import { useCartStore } from '../../store/useCartStore';
-import ProductSearchBar from './ProductSearchBar';
 import { useProductStore } from '../../store/useProductStore';
 
 const CartIcon = () => (
@@ -26,14 +25,33 @@ const CartIcon = () => (
   </svg>
 );
 
+// Buscador en el header que navega a /products?search=...
+const HeaderSearchBar = () => (
+  <form action='/products' method='GET' className='w-full max-w-xl flex relative'>
+    <input
+      type='text'
+      name='search'
+      placeholder='Buscar productos...'
+      className='flex-1 pl-4 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 placeholder-gray-500'
+      autoComplete='off'
+    />
+    <button type='submit' className='absolute right-2 top-1/2 -translate-y-1/2 p-2 text-blue-600 hover:text-blue-800'>
+      <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+        <path
+          strokeLinecap='round'
+          strokeLinejoin='round'
+          strokeWidth={2}
+          d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
+        />
+      </svg>
+    </button>
+  </form>
+);
+
 const Header: React.FC = () => {
   const cartCount = useCartStore((state) => state.getCartCount());
-  const { filters, setFilters } = useProductStore();
+  const { setFilters } = useProductStore();
   const [mounted, setMounted] = useState(false);
-
-  const handleSearchChange = (search: string) => {
-    setFilters({ search, page: 1 });
-  };
 
   useEffect(() => {
     setMounted(true);
@@ -56,14 +74,8 @@ const Header: React.FC = () => {
             </Link>
           </div>
 
-          {/* Buscador de productos */}
-          <div className='w-full max-w-xl'>
-            <ProductSearchBar
-              onSearchChange={handleSearchChange}
-              initialValue={filters.search || ''}
-              placeholder='Buscar productos...'
-            />
-          </div>
+          {/* Buscador en el header */}
+          <HeaderSearchBar />
 
           {/* Right side actions */}
           <div className='flex items-center space-x-4'>

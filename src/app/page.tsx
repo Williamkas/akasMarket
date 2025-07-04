@@ -1,185 +1,107 @@
-'use client';
-
-import React, { useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import ProductSortOptions from './components/ProductSortOptions';
-import ProductFilters from './components/ProductFilters';
-import PaginationControls from './components/PaginationControls';
-import { useProductStore } from '../store/useProductStore';
-import ProductCard from './components/ProductCard';
+import { getAllProducts } from '../services/productsService';
+import Image from 'next/image';
+import HeaderSSR from './components/HeaderSSR';
 
-// Skeleton para cards
-const ProductCardSkeleton = () => (
-  <div className='animate-pulse bg-white p-4 rounded-lg shadow flex flex-col'>
-    <div className='bg-gray-200 h-48 w-full rounded mb-4'></div>
-    <div className='h-4 bg-gray-200 rounded w-3/4 mb-2'></div>
-    <div className='h-3 bg-gray-100 rounded w-1/2 mb-2'></div>
-    <div className='h-4 bg-gray-200 rounded w-1/3'></div>
-  </div>
-);
+export default async function Home() {
+  // Fetch productos recientes
+  const recentRes = await getAllProducts({ sortBy: 'created_at', order: 'desc', limit: 6 });
+  const recentProducts = Array.isArray(recentRes.data) ? recentRes.data : [];
 
-export default function Home() {
-  const { products, loading, filters, pagination, setFilters, fetchProducts, error } = useProductStore();
-
-  // Effect to fetch products when filters change
-  useEffect(() => {
-    fetchProducts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters]);
-
-  // Handle sort change
-  const handleSortChange = useCallback(
-    (sortBy: string, order: 'asc' | 'desc') => {
-      setFilters({ sortBy, order, page: 1 });
-    },
-    [setFilters]
-  );
-
-  // Handle filters change
-  const handleFiltersChange = React.useCallback(
-    (filtersUpdate: { priceRange?: { min?: number; max?: number }; categories?: string[] }) => {
-      setFilters({
-        ...(filtersUpdate.priceRange
-          ? {
-              minPrice: filtersUpdate.priceRange.min,
-              maxPrice: filtersUpdate.priceRange.max
-            }
-          : {}),
-        ...(filtersUpdate.categories ? { categories: filtersUpdate.categories } : {}),
-        page: 1
+  // Obtener categorías destacadas de los productos recientes
+  const categorySet = new Set<string>();
+  recentProducts.forEach((p) => {
+    if (Array.isArray(p.categories)) {
+      p.categories.forEach((cat) => {
+        if (cat && cat !== 'Uncategorized') categorySet.add(cat);
       });
-    },
-    [setFilters]
-  );
-
-  // Handle page change
-  const handlePageChange = useCallback(
-    (page: number) => {
-      setFilters({ page });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    },
-    [setFilters]
-  );
-
-  // Obtener categorías únicas de los productos, solo válidas
-  const categories = React.useMemo(() => {
-    const set = new Set<string>();
-    products.forEach((p) => {
-      if (Array.isArray(p.categories)) {
-        p.categories.forEach((cat) => {
-          if (cat && cat !== 'Uncategorized') set.add(cat);
-        });
-      }
-    });
-    return Array.from(set).sort();
-  }, [products]);
+    }
+  });
+  const featuredCategories = Array.from(categorySet).slice(0, 6);
 
   return (
-    <div className='min-h-screen bg-gray-100'>
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
-        {/* Breadcrumb */}
-        <nav className='flex items-center space-x-2 text-sm text-gray-600 mb-6'>
-          <Link href='/' className='hover:text-gray-900 transition-colors'>
-            Inicio
-          </Link>
-
-          <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
-          </svg>
-          <span className='text-gray-900 font-medium'>Productos</span>
-        </nav>
-
-        {/* Título y buscador alineados */}
-        <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4'>
-          <div>
-            <h1 className='text-2xl font-bold text-gray-900 mb-1 sm:mb-0'>Productos</h1>
-            <p className='text-gray-600'>
-              {loading
-                ? 'Cargando productos...'
-                : `${pagination.totalCount} resultado${pagination.totalCount !== 1 ? 's' : ''} encontrado${
-                    pagination.totalCount !== 1 ? 's' : ''
-                  }`}
-            </p>
+    <>
+      <HeaderSSR />
+      {/* Fila de categorías tipo abanico */}
+      {featuredCategories.length > 0 && (
+        <div className='relative z-20 bg-white shadow-sm border-b flex items-center h-10'>
+          <div className='max-w-7xl mx-auto w-full flex items-center h-full px-4 sm:px-6 lg:px-8'>
+            <div className='group relative h-full flex items-center'>
+              <button className='text-blue-700 font-semibold text-lg h-full flex items-center px-3 hover:bg-blue-50 rounded transition'>
+                Categorías
+                <svg className='w-4 h-4 ml-1' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
+                </svg>
+              </button>
+              <div className='absolute left-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border opacity-0 group-hover:opacity-100 group-hover:visible invisible transition-opacity duration-200 flex flex-col py-2 z-30'>
+                {featuredCategories.map((cat) => (
+                  <Link
+                    key={cat}
+                    href={`/products?categories=${encodeURIComponent(cat)}`}
+                    className='px-4 py-2 hover:bg-blue-50 text-blue-700 text-base font-medium rounded transition'
+                  >
+                    {cat}
+                  </Link>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
-
-        {/* Error feedback visual */}
-        {error && (
-          <div className='mb-6 p-4 bg-red-100 border border-red-300 text-red-800 rounded'>
-            <strong>Error:</strong> {error}
-          </div>
-        )}
-
-        <div className='flex flex-col lg:flex-row gap-8 items-start'>
-          {/* Sidebar Filters */}
-          <aside className='w-full lg:w-[330px]'>
-            <div className='sticky top-4 space-y-6'>
-              <ProductSortOptions
-                onSortChange={handleSortChange}
-                currentSort={filters.sortBy}
-                currentOrder={filters.order}
-                label='Ordenar por:'
-              />
-              <ProductFilters onFiltersChange={handleFiltersChange} categories={categories} label='Filtrar por:' />
+      )}
+      <div className='min-h-screen bg-gray-100'>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+          {/* Banner principal */}
+          <section
+            className='mb-8 relative w-full flex flex-col items-center justify-center text-center'
+            style={{ height: 400 }}
+          >
+            <Image
+              src='/file.svg'
+              alt='Akas Market Banner'
+              fill
+              className='object-cover w-full h-full absolute top-0 left-0 z-0 opacity-20'
+              style={{ minHeight: 400 }}
+            />
+            <div className='relative z-10 flex flex-col items-center justify-center h-full w-full'>
+              <h1 className='text-4xl font-bold text-blue-700 mb-2'>Bienvenido a Akas Market</h1>
+              <p className='text-lg text-gray-700 mb-4'>
+                Descubre productos increíbles y las mejores ofertas para tu hogar y estilo de vida.
+              </p>
             </div>
-          </aside>
+          </section>
 
-          {/* Main Content */}
-          <section className='w-full lg:w-3/4 space-y-6'>
-            {/* Products List */}
-            {loading ? (
-              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <ProductCardSkeleton key={i} />
-                ))}
-              </div>
-            ) : error ? (
-              <div className='bg-white p-8 rounded-lg shadow text-center text-red-500'>{error}</div>
-            ) : products.length === 0 &&
-              (filters.search ||
-                filters.minPrice ||
-                filters.maxPrice ||
-                (filters.categories && filters.categories.length > 0)) ? (
-              <div className='bg-white p-8 rounded-lg shadow text-center text-gray-500'>
-                No se encontraron productos. Prueba ajustando tu búsqueda o los filtros.
-              </div>
-            ) : products.length === 0 ? (
-              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <ProductCardSkeleton key={i} />
-                ))}
-              </div>
-            ) : (
-              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
-                {products.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    id={product.id}
-                    title={product.title}
-                    price={product.price}
-                    imageUrl={product.main_image_url}
-                    status={product.status}
-                    delivery_type={product.delivery_type}
-                    onFavorite={() => {}}
+          {/* Productos recientes */}
+          <section>
+            <h2 className='text-2xl font-bold text-gray-900 mb-4'>Novedades</h2>
+            <div className='flex gap-6 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-blue-200'>
+              {recentProducts.map((product) => (
+                <Link
+                  key={product.id}
+                  href={`/products/${product.id}`}
+                  className='min-w-[280px] max-w-xs bg-white rounded-lg shadow p-4 hover:shadow-lg transition flex flex-col'
+                >
+                  <Image
+                    src={product.main_image_url || '/file.svg'}
+                    alt={product.title}
+                    width={400}
+                    height={192}
+                    className='w-full h-48 object-cover rounded mb-2'
                   />
-                ))}
-              </div>
-            )}
-
-            {/* Pagination */}
-            {!loading && products.length > 0 && (
-              <PaginationControls
-                currentPage={pagination.currentPage}
-                totalPages={pagination.totalPages}
-                totalCount={pagination.totalCount}
-                itemsPerPage={filters.limit || 12}
-                onPageChange={handlePageChange}
-                label='Página'
-              />
-            )}
+                  <h3 className='text-lg font-semibold text-gray-900'>{product.title}</h3>
+                  <p className='text-blue-700 font-bold mt-1 mb-2'>${product.price.toFixed(2)}</p>
+                  <div className='flex flex-wrap gap-2'>
+                    {product.categories?.map((cat) => (
+                      <span key={cat} className='bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full'>
+                        {cat}
+                      </span>
+                    ))}
+                  </div>
+                </Link>
+              ))}
+            </div>
           </section>
         </div>
       </div>
-    </div>
+    </>
   );
 }
