@@ -8,6 +8,8 @@ export interface CartItem {
 
 interface CartStore {
   items: CartItem[];
+  hydrated: boolean;
+  setHydrated: () => void;
   addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
   deleteFromCart: (productId: string) => void;
@@ -23,7 +25,11 @@ const getInitialCart = (): CartItem[] => {
 };
 
 export const useCartStore = create<CartStore>((set, get) => ({
-  items: getInitialCart(),
+  items: [],
+  hydrated: false,
+  setHydrated: () => {
+    set({ hydrated: true, items: getInitialCart() });
+  },
   addToCart: (product) => {
     set((state) => {
       const existing = state.items.find((item) => item.product.id === product.id);

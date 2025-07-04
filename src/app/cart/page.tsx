@@ -9,7 +9,7 @@ import Image from 'next/image';
 
 const CartPage: React.FC = () => {
   const router = useRouter();
-  const { items, addToCart, removeFromCart, deleteFromCart } = useCartStore();
+  const { items, addToCart, removeFromCart, deleteFromCart, hydrated } = useCartStore();
 
   // Cambiar cantidad: setea la cantidad exacta
   const handleQuantityChange = (productId: string, newQty: number, currentQty: number) => {
@@ -23,21 +23,31 @@ const CartPage: React.FC = () => {
   const total = items.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
   const totalCount = items.reduce((acc, item) => acc + item.quantity, 0);
 
+  // Don't render until hydrated to prevent hydration mismatch
+  if (!hydrated) {
+    return (
+      <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
+        <div className='text-center'>
+          <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto'></div>
+          <p className='mt-4 text-gray-600'>Cargando carrito...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className='min-h-screen bg-gray-50'>
       <div className='max-w-3xl mx-auto px-4 py-8'>
-        {/* Fondo gris para el botón Volver */}
-        <div className='bg-gray-50 mb-4'>
-          <button
-            onClick={() => router.back()}
-            className='inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors mr-4'
-          >
-            <svg className='w-5 h-5 mr-2' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 19l-7-7 7-7' />
-            </svg>
-            Volver
-          </button>
-        </div>
+        {/* Botón Volver sobre fondo gris general, sin div extra */}
+        <button
+          onClick={() => router.back()}
+          className='inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors mb-8'
+        >
+          <svg className='w-5 h-5 mr-2' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 19l-7-7 7-7' />
+          </svg>
+          Volver
+        </button>
         {/* Encabezado */}
         <div className='flex items-center mb-8'>
           <h1 className='text-2xl font-bold text-gray-900 mb-4'>Mi Carrito</h1>

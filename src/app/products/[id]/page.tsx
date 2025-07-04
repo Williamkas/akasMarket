@@ -7,7 +7,7 @@ import { getProductDetails } from '@/services/productService';
 import { useCartStore } from '@/store/useCartStore';
 import type { Product } from '@/services/productsService';
 import CustomDropdown from '@/app/components/CustomDropdown';
-import { useFavoritesStore } from '@/store/useFavoritesStore';
+import { useFavoritesStore, useFavoritesHydration } from '@/store/useFavoritesStore';
 import Image from 'next/image';
 
 const BackButton = () => (
@@ -31,10 +31,13 @@ export default function ProductDetail() {
   const [error, setError] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
 
-  const { addToCart, items } = useCartStore();
+  const { addToCart, items, hydrated: cartHydrated } = useCartStore();
   const cartItem = items.find((item) => item.product.id === productId);
   const { isFavorite, addFavorite, removeFavorite } = useFavoritesStore();
   const favorite = isFavorite(productId);
+
+  // Handle favorites hydration
+  useFavoritesHydration();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -120,6 +123,18 @@ export default function ProductDetail() {
     );
   }
 
+  // Don't render until cart is hydrated to prevent hydration mismatch
+  if (!cartHydrated) {
+    return (
+      <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
+        <div className='text-center'>
+          <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto'></div>
+          <p className='mt-4 text-gray-600'>Cargando...</p>
+        </div>
+      </div>
+    );
+  }
+
   // Stock máximo (si no hay stock, deshabilitar botones)
   const maxStock = typeof product.stock === 'number' ? product.stock : 10;
   const availableStock = maxStock - (cartItem?.quantity || 0);
@@ -131,10 +146,8 @@ export default function ProductDetail() {
   return (
     <div className='min-h-screen bg-gray-50'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
-        {/* Fondo gris para el botón Volver */}
-        <div className='bg-gray-50 mb-4'>
-          <BackButton />
-        </div>
+        {/* Botón Volver sobre fondo gris general, sin div extra */}
+        <BackButton />
         <div className='bg-white rounded-lg shadow-sm overflow-hidden'>
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 p-8'>
             {/* Product Image */}

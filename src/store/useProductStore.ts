@@ -15,6 +15,8 @@ interface ProductStore {
   filters: ProductFilters;
   pagination: Pagination;
   hasSearched: boolean;
+  hydrated: boolean;
+  setHydrated: () => void;
   setFilters: (filters: Partial<ProductFilters>) => void;
   setFiltersAndSearch: (filters: Partial<ProductFilters>) => void;
   clearFilters: () => void;
@@ -26,6 +28,8 @@ export const useProductStore = create<ProductStore>((set, get) => ({
   loading: false,
   error: null,
   hasSearched: false,
+  hydrated: false,
+  setHydrated: () => set({ hydrated: true }),
   filters: {
     page: 1,
     limit: 12,

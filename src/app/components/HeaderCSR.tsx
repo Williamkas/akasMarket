@@ -6,12 +6,14 @@ import { useProductStore } from '../../store/useProductStore';
 import CartIcon from './CartIcon';
 
 const HeaderCSR = () => {
-  const { filters, setFiltersAndSearch, clearFilters, fetchProducts } = useProductStore();
+  const { filters, setFiltersAndSearch, clearFilters, fetchProducts, hydrated } = useProductStore();
   const [search, setSearch] = useState(filters.search || '');
 
   useEffect(() => {
-    setSearch(filters.search || '');
-  }, [filters.search]);
+    if (hydrated) {
+      setSearch(filters.search || '');
+    }
+  }, [filters.search, hydrated]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,6 +22,31 @@ const HeaderCSR = () => {
     setFiltersAndSearch({ search, page: 1 });
     fetchProducts();
   };
+
+  // Don't render until hydrated to prevent hydration mismatch
+  if (!hydrated) {
+    return (
+      <header className='bg-blue-700 py-4'>
+        <div className='max-w-7xl mx-auto px-4'>
+          <div className='hidden md:flex items-center justify-between'>
+            <div className='flex items-center gap-3'>
+              <Link href='/' className='flex items-center gap-2'>
+                <Image src='/file.svg' alt='Logo' width={40} height={40} className='rounded-full bg-white' />
+                <span className='text-white text-2xl font-bold cursor-pointer'>Akas</span>
+              </Link>
+            </div>
+            <div className='flex-1 max-w-xl mx-8 relative'>
+              <div className='w-full px-4 py-2 rounded-lg border border-gray-300 bg-white animate-pulse'></div>
+            </div>
+            <div className='flex items-center gap-4'>
+              <div className='w-8 h-8 bg-white rounded-full animate-pulse'></div>
+              <div className='bg-white text-blue-700 px-4 py-2 rounded-lg font-semibold animate-pulse w-20'></div>
+            </div>
+          </div>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className='bg-blue-700 py-4'>

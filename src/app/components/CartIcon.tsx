@@ -2,15 +2,10 @@
 
 import Link from 'next/link';
 import { useCartStore } from '../../store/useCartStore';
-import { useState, useEffect } from 'react';
 
 const CartIcon = () => {
-  const cartCount = useCartStore((state) => state.getCartCount());
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const { getCartCount, hydrated } = useCartStore();
+  const cartCount = getCartCount();
 
   return (
     <Link href='/cart' className='relative group'>
@@ -30,7 +25,7 @@ const CartIcon = () => {
       </svg>
 
       {/* Contador de elementos */}
-      {mounted && cartCount > 0 && (
+      {hydrated && cartCount > 0 && (
         <span className='absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-lg'>
           {cartCount > 99 ? '99+' : cartCount}
         </span>

@@ -8,10 +8,12 @@ import ProductFilters from '../components/ProductFilters';
 import { useSearchParams } from 'next/navigation';
 
 export default function ProductsPage() {
-  const { fetchProducts, products, pagination, loading, error, filters, setFilters } = useProductStore();
+  const { fetchProducts, products, pagination, loading, error, filters, setFilters, hydrated } = useProductStore();
   const searchParams = useSearchParams();
 
   useEffect(() => {
+    if (!hydrated) return; // Don't fetch until hydrated
+
     const searchFromUrl = searchParams.get('search') || '';
     let categoriesFromUrl: string[] = [];
     const catParam = searchParams.getAll('categories');
@@ -38,7 +40,19 @@ export default function ProductsPage() {
       fetchProducts();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, [searchParams, hydrated]);
+
+  // Don't render until hydrated to prevent hydration mismatch
+  if (!hydrated) {
+    return (
+      <div className='min-h-screen bg-gray-100 flex items-center justify-center'>
+        <div className='text-center'>
+          <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto'></div>
+          <p className='mt-4 text-gray-600'>Cargando productos...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Obtener categorías únicas de los productos para los filtros
   const categories = Array.from(
