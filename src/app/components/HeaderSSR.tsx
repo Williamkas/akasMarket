@@ -1,37 +1,78 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import CartIconSSR from './CartIconSSR';
 
 const HeaderSSR = () => (
   <header className='bg-blue-700 py-4'>
-    <div className='max-w-7xl mx-auto flex items-center justify-between px-4'>
-      <div className='flex items-center gap-3'>
-        <Link href='/'>
-          <Image src='/file.svg' alt='Logo' width={40} height={40} className='rounded-full bg-white' />
-        </Link>
-        <span className='text-white text-2xl font-bold'>Akas</span>
+    <div className='max-w-7xl mx-auto px-4'>
+      {/* Desktop Layout */}
+      <div className='hidden md:flex items-center justify-between'>
+        <div className='flex items-center gap-3'>
+          <Link href='/' className='flex items-center gap-2'>
+            <Image src='/file.svg' alt='Logo' width={40} height={40} className='rounded-full bg-white' />
+            <span className='text-white text-2xl font-bold cursor-pointer'>Akas</span>
+          </Link>
+        </div>
+        <form action='/products' method='GET' className='flex-1 max-w-xl mx-8 relative'>
+          <input
+            type='text'
+            name='search'
+            placeholder='Buscar productos...'
+            className='w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 pr-10'
+          />
+          <button type='submit' className='absolute right-2 top-1/2 -translate-y-1/2 text-blue-600 hover:text-blue-800'>
+            <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+              <circle cx='11' cy='11' r='8' strokeWidth='2' />
+              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M21 21l-3.5-3.5' />
+            </svg>
+          </button>
+        </form>
+        <div className='flex items-center gap-4'>
+          <CartIconSSR />
+          <Link href='/profile' className='bg-white text-blue-700 px-4 py-2 rounded-lg font-semibold'>
+            Perfil
+          </Link>
+        </div>
       </div>
-      <form action='/products' method='GET' className='flex-1 max-w-xl mx-8'>
-        <input
-          type='text'
-          name='search'
-          placeholder='Buscar productos...'
-          className='w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400'
-        />
-      </form>
-      <div className='flex items-center gap-4'>
-        <Link href='/cart' className='relative'>
-          <svg className='w-7 h-7 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-            <path
-              strokeLinecap='round'
-              strokeLinejoin='round'
-              strokeWidth={2}
-              d='M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.35 2.7A2 2 0 007.52 19h8.96a2 2 0 001.87-2.3L17 13M7 13V6a4 4 0 014-4h0a4 4 0 014 4v7'
-            />
-          </svg>
-        </Link>
-        <Link href='/profile' className='bg-white text-blue-700 px-4 py-2 rounded-lg font-semibold'>
-          Perfil
-        </Link>
+
+      {/* Mobile Layout */}
+      <div className='md:hidden space-y-3'>
+        {/* Top row: Logo, Cart, Profile */}
+        <div className='flex items-center justify-between'>
+          <Link href='/' className='flex items-center gap-2'>
+            <Image src='/file.svg' alt='Logo' width={32} height={32} className='rounded-full bg-white' />
+            <span className='text-white text-xl font-bold cursor-pointer'>Akas</span>
+          </Link>
+          <div className='flex items-center gap-3'>
+            <CartIconSSR />
+            <Link href='/profile' className='text-white hover:text-gray-200 transition-colors'>
+              <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'
+                />
+              </svg>
+            </Link>
+          </div>
+        </div>
+
+        {/* Bottom row: Search */}
+        <form action='/products' method='GET' className='relative'>
+          <input
+            type='text'
+            name='search'
+            placeholder='Buscar productos...'
+            className='w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 pr-10'
+          />
+          <button type='submit' className='absolute right-2 top-1/2 -translate-y-1/2 text-blue-600 hover:text-blue-800'>
+            <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+              <circle cx='11' cy='11' r='8' strokeWidth='2' />
+              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M21 21l-3.5-3.5' />
+            </svg>
+          </button>
+        </form>
       </div>
     </div>
   </header>

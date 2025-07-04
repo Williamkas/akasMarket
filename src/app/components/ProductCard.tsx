@@ -36,13 +36,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ id, title, price, imageUrl, s
       onMouseLeave={() => setHovered(false)}
     >
       <div className='relative'>
-        <Image
-          src={imageUrl || '/file.svg'}
-          alt={title}
-          width={400}
-          height={192}
-          className='w-full h-48 object-cover rounded-md'
-        />
+        <div className='w-full aspect-square rounded-md overflow-hidden bg-gray-100'>
+          <Image
+            src={imageUrl || '/file.svg'}
+            alt={title}
+            fill
+            className='w-full h-full object-cover rounded-md'
+            style={{ aspectRatio: '1/1' }}
+          />
+        </div>
         {/* Icono de favorito solo en hover */}
         <button
           type='button'
@@ -63,14 +65,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ id, title, price, imageUrl, s
         </button>
       </div>
       <h2 className='text-lg font-semibold mt-2'>{title}</h2>
+      {/* Precio destacado arriba de los tags */}
+      <p className='text-blue-700 font-bold text-xl mt-2 mb-1'>${price.toFixed(2)}</p>
       {/* Tags de características */}
-      <div className='flex flex-wrap gap-2 mt-2 mb-2'>
+      <div className='flex flex-wrap gap-2 mb-2'>
         <span className='bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium'>
           {status === 'new' ? 'Nuevo' : 'Usado'}
         </span>
         <span className='bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium'>{delivery_type}</span>
       </div>
-      <p className='text-gray-700'>${price.toFixed(2)}</p>
     </Link>
   );
 };

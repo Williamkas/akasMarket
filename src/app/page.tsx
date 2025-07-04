@@ -33,7 +33,7 @@ export default async function Home() {
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
                 </svg>
               </button>
-              <div className='absolute left-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border opacity-0 group-hover:opacity-100 group-hover:visible invisible transition-opacity duration-200 flex flex-col py-2 z-30'>
+              <div className='absolute left-0 top-full w-48 bg-white rounded-lg shadow-lg border opacity-0 group-hover:opacity-100 group-hover:visible invisible transition-opacity duration-200 flex flex-col py-2 z-30'>
                 {featuredCategories.map((cat) => (
                   <Link
                     key={cat}
@@ -52,16 +52,9 @@ export default async function Home() {
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
           {/* Banner principal */}
           <section
-            className='mb-8 relative w-full flex flex-col items-center justify-center text-center'
-            style={{ height: 400 }}
+            className='mb-8 relative w-full flex flex-col items-center justify-center text-center bg-blue-100 px-4 sm:px-6 lg:px-8'
+            style={{ height: 300 }}
           >
-            <Image
-              src='/file.svg'
-              alt='Akas Market Banner'
-              fill
-              className='object-cover w-full h-full absolute top-0 left-0 z-0 opacity-20'
-              style={{ minHeight: 400 }}
-            />
             <div className='relative z-10 flex flex-col items-center justify-center h-full w-full'>
               <h1 className='text-4xl font-bold text-blue-700 mb-2'>Bienvenido a Akas Market</h1>
               <p className='text-lg text-gray-700 mb-4'>
@@ -78,15 +71,17 @@ export default async function Home() {
                 <Link
                   key={product.id}
                   href={`/products/${product.id}`}
-                  className='min-w-[280px] max-w-xs bg-white rounded-lg shadow p-4 hover:shadow-lg transition flex flex-col'
+                  className='min-w-[280px] w-[280px] bg-white rounded-lg shadow p-4 hover:shadow-lg transition flex flex-col'
                 >
-                  <Image
-                    src={product.main_image_url || '/file.svg'}
-                    alt={product.title}
-                    width={400}
-                    height={192}
-                    className='w-full h-48 object-cover rounded mb-2'
-                  />
+                  <div className='aspect-square w-full mb-2'>
+                    <Image
+                      src={product.main_image_url || '/file.svg'}
+                      alt={product.title}
+                      width={280}
+                      height={280}
+                      className='w-full h-full object-cover rounded'
+                    />
+                  </div>
                   <h3 className='text-lg font-semibold text-gray-900'>{product.title}</h3>
                   <p className='text-blue-700 font-bold mt-1 mb-2'>${product.price.toFixed(2)}</p>
                   <div className='flex flex-wrap gap-2'>

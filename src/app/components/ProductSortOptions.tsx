@@ -15,13 +15,13 @@ const SORT_OPTIONS: SortOption[] = [
 ];
 
 const ProductSortOptions: React.FC<{ label?: string }> = ({ label }) => {
-  const { filters, setFilters, fetchProducts } = useProductStore();
+  const { filters, setFiltersAndSearch, fetchProducts } = useProductStore();
   const current: SortOption =
     SORT_OPTIONS.find((opt) => opt.value.sortBy === filters.sortBy && opt.value.order === filters.order) ||
     SORT_OPTIONS[0];
 
   const handleChange = (option: SortOption) => {
-    setFilters({ sortBy: option.value.sortBy, order: option.value.order, page: 1 });
+    setFiltersAndSearch({ sortBy: option.value.sortBy, order: option.value.order, page: 1 });
     fetchProducts();
   };
 

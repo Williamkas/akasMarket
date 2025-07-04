@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { useEffect } from 'react';
 
 interface FavoritesState {
   favorites: string[];
@@ -18,7 +19,15 @@ export const useFavoritesStore = create<FavoritesState>()(
       isFavorite: (productId) => get().favorites.includes(productId)
     }),
     {
-      name: 'favorites-storage'
+      name: 'favorites-storage',
+      skipHydration: true
     }
   )
 );
+
+// Hook personalizado para manejar la hidratación
+export const useFavoritesHydration = () => {
+  useEffect(() => {
+    useFavoritesStore.persist.rehydrate();
+  }, []);
+};

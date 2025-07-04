@@ -29,10 +29,10 @@ const ProductCardSkeleton = () => (
 );
 
 const ProductGrid: React.FC<ProductGridProps> = ({ products, pagination, loading, error }) => {
-  const { setFilters, fetchProducts } = useProductStore();
+  const { setFiltersAndSearch, fetchProducts, hasSearched } = useProductStore();
 
   const handlePageChange = (page: number) => {
-    setFilters({ page });
+    setFiltersAndSearch({ page });
     fetchProducts();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -48,7 +48,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products, pagination, loading
         </div>
       ) : error ? (
         <div className='bg-white p-8 rounded-lg shadow text-center text-red-500'>{error}</div>
-      ) : products.length === 0 ? (
+      ) : hasSearched && products.length === 0 ? (
         <div className='bg-white p-8 rounded-lg shadow text-center text-gray-500'>
           No se encontraron productos. Prueba ajustando tu búsqueda o los filtros.
         </div>

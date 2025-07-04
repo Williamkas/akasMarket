@@ -18,12 +18,21 @@ export default function ProductsPage() {
     if (catParam.length > 0) {
       categoriesFromUrl = catParam;
     }
+
     // Solo actualiza si hay diferencia
     const shouldUpdate =
       searchFromUrl !== filters.search ||
       (categoriesFromUrl.length > 0 && filters.categories?.join(',') !== categoriesFromUrl.join(','));
+
     if (shouldUpdate) {
-      setFilters({ search: searchFromUrl, categories: categoriesFromUrl, page: 1 });
+      // Si hay parámetros de búsqueda, marcar como búsqueda
+      const hasSearchParams = searchFromUrl || categoriesFromUrl.length > 0;
+      if (hasSearchParams) {
+        setFilters({ search: searchFromUrl, categories: categoriesFromUrl, page: 1 });
+      } else {
+        // Si no hay parámetros, solo actualizar sin marcar como búsqueda
+        setFilters({ search: searchFromUrl, categories: categoriesFromUrl, page: 1 });
+      }
       fetchProducts();
     } else {
       fetchProducts();
@@ -50,14 +59,14 @@ export default function ProductsPage() {
         </div>
         <div className='flex flex-col lg:flex-row gap-8 items-start'>
           {/* Sidebar */}
-          <aside className='w-full lg:w-[330px]'>
+          <aside className='w-full lg:w-1/4'>
             <div className='sticky top-4 space-y-6'>
               <ProductSortOptions label='Ordenar por:' />
               <ProductFilters categories={categories} label='Filtrar por:' />
             </div>
           </aside>
           {/* Main Content */}
-          <section className='w-full lg:w-3/4 space-y-6 flex-1'>
+          <section className='w-full lg:w-3/4 flex-1 space-y-6'>
             <ProductGrid products={products} pagination={pagination} loading={loading} error={error} />
           </section>
         </div>

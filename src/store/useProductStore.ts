@@ -14,7 +14,10 @@ interface ProductStore {
   error: string | null;
   filters: ProductFilters;
   pagination: Pagination;
+  hasSearched: boolean;
   setFilters: (filters: Partial<ProductFilters>) => void;
+  setFiltersAndSearch: (filters: Partial<ProductFilters>) => void;
+  clearFilters: () => void;
   fetchProducts: () => Promise<void>;
 }
 
@@ -22,6 +25,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
   products: [],
   loading: false,
   error: null,
+  hasSearched: false,
   filters: {
     page: 1,
     limit: 12,
@@ -37,6 +41,26 @@ export const useProductStore = create<ProductStore>((set, get) => ({
   setFilters: (filters) => {
     set((state) => ({
       filters: { ...state.filters, ...filters, page: filters.page ?? 1 }
+    }));
+  },
+  setFiltersAndSearch: (filters) => {
+    set((state) => ({
+      filters: { ...state.filters, ...filters, page: filters.page ?? 1 },
+      hasSearched: true
+    }));
+  },
+  clearFilters: () => {
+    set((state) => ({
+      filters: {
+        ...state.filters,
+        categories: undefined,
+        minPrice: undefined,
+        maxPrice: undefined,
+        sortBy: 'title',
+        order: 'asc',
+        page: 1
+      },
+      hasSearched: true
     }));
   },
   fetchProducts: async () => {

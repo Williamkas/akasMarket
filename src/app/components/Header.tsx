@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import LogoAkas from './LogoAkas';
 import { useCartStore } from '../../store/useCartStore';
-import { useProductStore } from '../../store/useProductStore';
 
 const CartIcon = () => (
   <svg
@@ -50,7 +49,6 @@ const HeaderSearchBar = () => (
 
 const Header: React.FC = () => {
   const cartCount = useCartStore((state) => state.getCartCount());
-  const { setFilters } = useProductStore();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {

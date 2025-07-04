@@ -11,12 +11,15 @@ import { useFavoritesStore } from '@/store/useFavoritesStore';
 import Image from 'next/image';
 
 const BackButton = () => (
-  <Link href='/' className='inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors mb-6'>
+  <button
+    onClick={() => window.history.back()}
+    className='inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors mb-6'
+  >
     <svg className='w-5 h-5 mr-2' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
       <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 19l-7-7 7-7' />
     </svg>
-    Atrás
-  </Link>
+    Volver
+  </button>
 );
 
 export default function ProductDetail() {
@@ -128,8 +131,10 @@ export default function ProductDetail() {
   return (
     <div className='min-h-screen bg-gray-50'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
-        <BackButton />
-
+        {/* Fondo gris para el botón Volver */}
+        <div className='bg-gray-50 mb-4'>
+          <BackButton />
+        </div>
         <div className='bg-white rounded-lg shadow-sm overflow-hidden'>
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 p-8'>
             {/* Product Image */}
@@ -175,6 +180,7 @@ export default function ProductDetail() {
                   </button>
                 </div>
                 <h1 className='text-3xl font-bold text-gray-900'>{product.title}</h1>
+                <p className='text-2xl font-bold text-blue-700 mt-2'>${product.price.toFixed(2)}</p>
               </div>
 
               <div>
@@ -206,7 +212,7 @@ export default function ProductDetail() {
               {/* Cantidad y stock */}
               <div className='mb-2 flex items-center gap-2'>
                 <span className='text-gray-700'>Cantidad:</span>
-                <div className='w-32'>
+                <div className='w-44'>
                   <CustomDropdown
                     options={Array.from({ length: Math.min(availableStock, 10) }, (_, i) => i + 1)}
                     value={quantity}
