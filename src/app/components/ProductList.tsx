@@ -57,22 +57,6 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
                 />
               </svg>
             </button>
-            <button className='bg-white text-gray-800 p-2 rounded-full shadow-md hover:bg-gray-50 transition-colors'>
-              <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={2}
-                  d='M15 12a3 3 0 11-6 0 3 3 0 016 0z'
-                />
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={2}
-                  d='M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z'
-                />
-              </svg>
-            </button>
           </div>
         </div>
       </div>
@@ -90,17 +74,20 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
         {product.categories && product.categories.length > 0 && (
           <div className='mb-3'>
             <div className='flex flex-wrap gap-1'>
-              {product.categories.slice(0, 2).map((category, index) => (
-                <span
-                  key={index}
-                  className='inline-block px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full'
-                >
-                  {category}
-                </span>
-              ))}
-              {product.categories.length > 2 && (
+              {product.categories
+                .filter((category) => category && category !== 'Uncategorized')
+                .slice(0, 2)
+                .map((category, index) => (
+                  <span
+                    key={index}
+                    className='inline-block px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full'
+                  >
+                    {category}
+                  </span>
+                ))}
+              {product.categories.filter((category) => category && category !== 'Uncategorized').length > 2 && (
                 <span className='inline-block px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full'>
-                  +{product.categories.length - 2}
+                  +{product.categories.filter((category) => category && category !== 'Uncategorized').length - 2}
                 </span>
               )}
             </div>
@@ -112,9 +99,6 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
           <div className='flex items-center space-x-2'>
             <span className='text-2xl font-bold text-gray-900'>${product.price.toFixed(2)}</span>
           </div>
-          <button className='bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm'>
-            Add to Cart
-          </button>
         </div>
       </div>
     </div>

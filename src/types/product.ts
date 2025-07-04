@@ -14,6 +14,9 @@ export interface ProductQueryParams {
   search?: string;
   sortBy: 'title' | 'price';
   order: 'asc' | 'desc';
+  minPrice?: number;
+  maxPrice?: number;
+  categories?: string[];
 }
 
 export interface ProductListResponse {

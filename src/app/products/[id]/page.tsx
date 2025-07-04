@@ -1,6 +1,8 @@
 import { getProductDetails } from '@/services/productService';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import ProductActions from './ProductActions';
+import BackButton from './BackButton';
 
 interface ProductPageProps {
   params: { id: string };
@@ -19,6 +21,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   return (
     <div className='max-w-3xl mx-auto py-10 px-4'>
+      <BackButton />
       <div className='flex flex-col md:flex-row gap-8'>
         {/* Imagen principal */}
         <div className='flex-shrink-0 w-full md:w-1/2'>
@@ -50,6 +53,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </div>
           )}
           {/* Aquí puedes agregar más detalles, botones, etc. */}
+          <ProductActions product={product} />
         </div>
       </div>
     </div>

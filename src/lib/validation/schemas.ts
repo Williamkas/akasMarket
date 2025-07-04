@@ -63,7 +63,26 @@ export const productsSchema = z.object({
   order: z
     .enum(['asc', 'desc'])
     .nullable()
-    .transform((val) => val ?? 'asc')
+    .transform((val) => val ?? 'asc'),
+  minPrice: z
+    .string()
+    .optional()
+    .transform((val) => (val ? parseFloat(val) : undefined)),
+  maxPrice: z
+    .string()
+    .optional()
+    .transform((val) => (val ? parseFloat(val) : undefined)),
+  categories: z
+    .string()
+    .optional()
+    .transform((val) =>
+      val
+        ? val
+            .split(',')
+            .map((c) => c.trim())
+            .filter(Boolean)
+        : undefined
+    )
 });
 
 export const productIdSchema = z.string().uuid('Invalid product ID format');

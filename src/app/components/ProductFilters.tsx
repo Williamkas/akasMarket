@@ -1,55 +1,47 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface PriceRange {
-  min: number;
-  max: number;
+  min?: number;
+  max?: number;
 }
 
 interface ProductFiltersProps {
-  onFiltersChange: (filters: {
-    priceRange?: PriceRange;
-    categories?: string[];
-  }) => void;
+  onFiltersChange: (filters: { priceRange?: PriceRange; categories?: string[] }) => void;
+  categories: string[];
 }
 
-const categories = [
-  'Kitchen',
-  'Home & Garden',
-  'Electronics',
-  'Clothing',
-  'Sports',
-  'Books',
-  'Toys',
-  'Beauty'
-];
-
-const ProductFilters: React.FC<ProductFiltersProps> = ({ onFiltersChange }) => {
-  const [priceRange, setPriceRange] = useState<PriceRange>({ min: 0, max: 1000 });
+const ProductFilters: React.FC<ProductFiltersProps> = ({ onFiltersChange, categories }) => {
+  const [priceRange, setPriceRange] = useState<PriceRange>({});
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [isExpanded, setIsExpanded] = useState(true);
 
+  // Solo enviar priceRange si hay algún valor
+  useEffect(() => {
+    onFiltersChange({
+      priceRange: priceRange.min !== undefined || priceRange.max !== undefined ? priceRange : undefined,
+      categories: selectedCategories
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [priceRange, selectedCategories]);
+
   const handlePriceRangeChange = (field: 'min' | 'max', value: string) => {
-    const numValue = parseFloat(value) || 0;
+    const numValue = value === '' ? undefined : parseFloat(value);
     const newRange = { ...priceRange, [field]: numValue };
     setPriceRange(newRange);
-    onFiltersChange({ priceRange: newRange, categories: selectedCategories });
   };
 
   const handleCategoryToggle = (category: string) => {
     const updatedCategories = selectedCategories.includes(category)
-      ? selectedCategories.filter(c => c !== category)
+      ? selectedCategories.filter((c) => c !== category)
       : [...selectedCategories, category];
-    
     setSelectedCategories(updatedCategories);
-    onFiltersChange({ priceRange, categories: updatedCategories });
   };
 
   const clearAllFilters = () => {
-    setPriceRange({ min: 0, max: 1000 });
+    setPriceRange({});
     setSelectedCategories([]);
-    onFiltersChange({ priceRange: { min: 0, max: 1000 }, categories: [] });
   };
 
   return (
@@ -59,18 +51,20 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({ onFiltersChange }) => {
         <div className='flex items-center justify-between'>
           <h3 className='text-lg font-semibold text-gray-900 flex items-center'>
             <svg className='w-5 h-5 mr-2 text-gray-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4' />
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4'
+              />
             </svg>
             Filters
           </h3>
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className='text-gray-500 hover:text-gray-700 lg:hidden'
-          >
-            <svg 
-              className={`w-5 h-5 transform transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
-              fill='none' 
-              stroke='currentColor' 
+          <button onClick={() => setIsExpanded(!isExpanded)} className='text-gray-500 hover:text-gray-700 lg:hidden'>
+            <svg
+              className={`w-5 h-5 transform transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+              fill='none'
+              stroke='currentColor'
               viewBox='0 0 24 24'
             >
               <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
@@ -83,7 +77,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({ onFiltersChange }) => {
       <div className={`${isExpanded ? 'block' : 'hidden lg:block'}`}>
         <div className='p-4 space-y-6'>
           {/* Clear Filters Button */}
-          {(selectedCategories.length > 0 || priceRange.min > 0 || priceRange.max < 1000) && (
+          {(selectedCategories.length > 0 || priceRange.min !== undefined || priceRange.max !== undefined) && (
             <button
               onClick={clearAllFilters}
               className='w-full text-sm text-blue-600 hover:text-blue-800 font-medium border border-blue-200 rounded-md py-2 hover:bg-blue-50 transition-colors'
@@ -100,22 +94,22 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({ onFiltersChange }) => {
                 <label className='block text-sm text-gray-600 mb-1'>Min ($)</label>
                 <input
                   type='number'
-                  value={priceRange.min}
+                  value={priceRange.min === undefined ? '' : priceRange.min}
                   onChange={(e) => handlePriceRangeChange('min', e.target.value)}
                   className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm'
                   min='0'
-                  placeholder='0'
+                  placeholder='Min'
                 />
               </div>
               <div>
                 <label className='block text-sm text-gray-600 mb-1'>Max ($)</label>
                 <input
                   type='number'
-                  value={priceRange.max}
+                  value={priceRange.max === undefined ? '' : priceRange.max}
                   onChange={(e) => handlePriceRangeChange('max', e.target.value)}
                   className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm'
                   min='0'
-                  placeholder='1000'
+                  placeholder='Max'
                 />
               </div>
             </div>
@@ -143,13 +137,13 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({ onFiltersChange }) => {
           </div>
 
           {/* Active Filters Summary */}
-          {(selectedCategories.length > 0 || priceRange.min > 0 || priceRange.max < 1000) && (
+          {(selectedCategories.length > 0 || priceRange.min !== undefined || priceRange.max !== undefined) && (
             <div className='pt-4 border-t border-gray-200'>
               <h5 className='text-sm font-medium text-gray-900 mb-2'>Active Filters:</h5>
               <div className='space-y-2'>
-                {(priceRange.min > 0 || priceRange.max < 1000) && (
+                {(priceRange.min !== undefined || priceRange.max !== undefined) && (
                   <div className='text-sm text-gray-600'>
-                    Price: ${priceRange.min} - ${priceRange.max}
+                    Price: ${priceRange.min ?? '-'} - ${priceRange.max ?? '-'}
                   </div>
                 )}
                 {selectedCategories.length > 0 && (

@@ -35,9 +35,21 @@ export default function Home() {
   );
 
   // Handle filters change
-  const handleFiltersChange = useCallback(() => {
-    setFilters({ page: 1 });
-  }, [setFilters]);
+  const handleFiltersChange = React.useCallback(
+    (filtersUpdate: { priceRange?: { min?: number; max?: number }; categories?: string[] }) => {
+      setFilters({
+        ...(filtersUpdate.priceRange
+          ? {
+              minPrice: filtersUpdate.priceRange.min,
+              maxPrice: filtersUpdate.priceRange.max
+            }
+          : {}),
+        ...(filtersUpdate.categories ? { categories: filtersUpdate.categories } : {}),
+        page: 1
+      });
+    },
+    [setFilters]
+  );
 
   // Handle page change
   const handlePageChange = useCallback(
@@ -47,6 +59,19 @@ export default function Home() {
     },
     [setFilters]
   );
+
+  // Obtener categorías únicas de los productos, solo válidas
+  const categories = React.useMemo(() => {
+    const set = new Set<string>();
+    products.forEach((p) => {
+      if (Array.isArray(p.categories)) {
+        p.categories.forEach((cat) => {
+          if (cat && cat !== 'Uncategorized') set.add(cat);
+        });
+      }
+    });
+    return Array.from(set).sort();
+  }, [products]);
 
   return (
     <div className='min-h-screen bg-gray-50'>
@@ -84,7 +109,7 @@ export default function Home() {
           {/* Sidebar Filters */}
           <aside className='w-full lg:w-1/4'>
             <div className='sticky top-4'>
-              <ProductFilters onFiltersChange={handleFiltersChange} />
+              <ProductFilters onFiltersChange={handleFiltersChange} categories={categories} />
             </div>
           </aside>
 

@@ -10,20 +10,32 @@ import { getAuthenticatedAdminUser } from '@/lib/supabase/userAuth';
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
 
+  // Manejo seguro de categories para evitar pasar un array al schema
+  let categoriesParam: string | undefined = undefined;
+  const allCategories = searchParams.getAll('categories');
+  if (allCategories.length > 1) {
+    categoriesParam = allCategories.join(',');
+  } else if (allCategories.length === 1) {
+    categoriesParam = allCategories[0];
+  }
+
   // 📌 Validación de los parámetros de consulta
   const validation = productsSchema.safeParse({
     page: searchParams.get('page') ?? '1',
     limit: searchParams.get('limit') ?? '10',
     search: searchParams.get('search') ?? '',
     sortBy: searchParams.get('sortBy') ?? 'title',
-    order: searchParams.get('order') ?? 'asc'
+    order: searchParams.get('order') ?? 'asc',
+    minPrice: searchParams.get('minPrice') ?? undefined,
+    maxPrice: searchParams.get('maxPrice') ?? undefined,
+    categories: categoriesParam
   });
 
   if (!validation.success) {
     return handleError(400, 'Invalid query parameters', validation.error.errors);
   }
 
-  const { page, limit, search, sortBy, order }: ProductQueryParams = validation.data;
+  const { page, limit, search, sortBy, order, minPrice, maxPrice, categories }: ProductQueryParams = validation.data;
 
   // 📌 Se calcula el rango de datos para la paginación
   const from = (page - 1) * limit;
@@ -40,6 +52,22 @@ export async function GET(request: Request) {
     // 📌 Aplicar búsqueda si hay un término
     if (search) {
       query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
+    }
+
+    // 📌 Filtrar por rango de precio
+    if (typeof minPrice === 'number') {
+      query = query.gte('price', minPrice); // .gte = "mayor o igual que"
+    }
+    if (typeof maxPrice === 'number') {
+      query = query.lte('price', maxPrice); // .lte = "menor o igual que"
+    }
+
+    // 📌 Filtrar por categorías (array contiene alguna de las seleccionadas)
+    if (categories && Array.isArray(categories)) {
+      const validCategories = categories.filter((cat) => cat && cat !== 'Uncategorized');
+      if (validCategories.length > 0) {
+        query = query.contains('categories', validCategories);
+      }
     }
 
     const { data, error, count } = await query;

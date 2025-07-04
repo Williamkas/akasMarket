@@ -6,9 +6,12 @@ export interface ProductFilters {
   search?: string;
   sortBy?: string;
   order?: 'asc' | 'desc';
+  minPrice?: number;
+  maxPrice?: number;
+  categories?: string[];
 }
 
-interface Product {
+export interface Product {
   id: string;
   title: string;
   description: string;
@@ -32,7 +35,10 @@ export const getAllProducts = async (filters: ProductFilters = {}): Promise<GetA
     limit: String(filters.limit ?? 10),
     search: filters.search ?? '',
     sortBy: filters.sortBy ?? 'title',
-    order: filters.order ?? 'asc'
+    order: filters.order ?? 'asc',
+    ...(filters.minPrice !== undefined ? { minPrice: String(filters.minPrice) } : {}),
+    ...(filters.maxPrice !== undefined ? { maxPrice: String(filters.maxPrice) } : {}),
+    ...(filters.categories && filters.categories.length > 0 ? { categories: filters.categories.join(',') } : {})
   });
 
   const response = await api.get(`/api/products?${params.toString()}`);
