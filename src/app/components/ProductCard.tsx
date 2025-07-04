@@ -23,7 +23,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ id, title, price, imageUrl, s
       onMouseLeave={() => setHovered(false)}
     >
       <div className='relative'>
-        <Image src={imageUrl} alt={title} width={400} height={192} className='w-full h-48 object-cover rounded-md' />
+        <Image
+          src={imageUrl || '/file.svg'}
+          alt={title}
+          width={400}
+          height={192}
+          className='w-full h-48 object-cover rounded-md'
+        />
         {/* Icono de favorito solo en hover */}
         <button
           type='button'
