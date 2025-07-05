@@ -45,6 +45,12 @@ export default async function Home() {
                 ))}
               </div>
             </div>
+            <Link
+              href='/products'
+              className='ml-4 text-blue-700 font-semibold text-lg h-full flex items-center px-3 hover:bg-blue-50 rounded transition'
+            >
+              Productos
+            </Link>
           </div>
         </div>
       )}

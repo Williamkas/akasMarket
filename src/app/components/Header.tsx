@@ -91,7 +91,7 @@ const Header: React.FC = () => {
             {/* Profile/Login */}
             <Link href='/api/auth/logout'>
               <button className='bg-white text-[#0052cc] px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors font-medium'>
-                Perfil
+                Mi cuenta
               </button>
             </Link>
           </div>

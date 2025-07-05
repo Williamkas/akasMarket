@@ -79,7 +79,7 @@ const HeaderCSR = () => {
           </form>
           <div className='flex items-center gap-4'>
             <Link href='/profile' className='bg-white text-blue-700 px-4 py-2 rounded-lg font-semibold'>
-              Perfil
+              Mi cuenta
             </Link>
             <CartIcon />
           </div>
