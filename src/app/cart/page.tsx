@@ -4,8 +4,9 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useCartStore } from '@/store/useCartStore';
-import CustomDropdown from '../components/CustomDropdown';
 import Image from 'next/image';
+import QuantitySelector from '../components/QuantitySelector';
+import Breadcrumb from '../components/Breadcrumb';
 
 const CartPage: React.FC = () => {
   const router = useRouter();
@@ -26,7 +27,7 @@ const CartPage: React.FC = () => {
   // Don't render until hydrated to prevent hydration mismatch
   if (!hydrated) {
     return (
-      <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
+      <div className='min-h-screen flex items-center justify-center'>
         <div className='text-center'>
           <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto'></div>
           <p className='mt-4 text-gray-600'>Cargando carrito...</p>
@@ -38,6 +39,7 @@ const CartPage: React.FC = () => {
   return (
     <div className='min-h-screen'>
       <div className='max-w-3xl mx-auto px-4 py-8'>
+        <Breadcrumb />
         {/* Botón Volver sobre fondo gris general, sin div extra */}
         <button
           onClick={() => router.back()}
@@ -48,13 +50,14 @@ const CartPage: React.FC = () => {
           </svg>
           Volver
         </button>
+
         {/* Lista de productos */}
         {items.length === 0 ? (
           <div className='bg-white p-8 rounded-lg shadow text-center text-gray-500'>
             <h1 className='text-2xl font-bold text-gray-900 mb-4'>Mi Carrito</h1>
             Tu carrito está vacío.
             <div className='mt-4'>
-              <Link href='/' className='text-blue-600 hover:underline'>
+              <Link href='/products' className='text-blue-600 hover:underline'>
                 Ver productos
               </Link>
             </div>
@@ -64,35 +67,68 @@ const CartPage: React.FC = () => {
             <h1 className='text-2xl font-bold text-gray-900 mb-6'>Mi Carrito</h1>
             <ul className='divide-y divide-gray-200'>
               {items.map(({ product, quantity }) => (
-                <li key={product.id} className='flex items-center py-4 gap-4'>
-                  <Image
-                    src={product.main_image_url || '/file.svg'}
-                    alt={product.title}
-                    width={80}
-                    height={80}
-                    className='w-20 h-20 object-cover rounded'
-                  />
-                  <div className='flex-1'>
-                    <h2 className='font-semibold text-gray-900'>{product.title}</h2>
-                    <p className='text-gray-500 text-sm'>${product.price.toFixed(2)} c/u</p>
-                    <div className='flex items-center gap-2 mt-2'>
-                      <span className='text-gray-700 text-sm'>Cantidad:</span>
-                      <CustomDropdown
-                        options={Array.from({ length: Math.min(product.stock, 10) }, (_, i) => i + 1)}
-                        value={quantity}
-                        onChange={(val) => handleQuantityChange(product.id, val, quantity)}
-                        renderOption={(val) => `${val} unidad${val > 1 ? 'es' : ''}`}
+                <li key={product.id} className='py-4'>
+                  <div className='flex flex-col sm:flex-row gap-4'>
+                    {/* Product Image - Clickable */}
+                    <Link href={`/products/${product.id}`} className='flex-shrink-0'>
+                      <Image
+                        src={product.main_image_url || '/file.svg'}
+                        alt={product.title}
+                        width={80}
+                        height={80}
+                        className='w-20 h-20 object-cover rounded cursor-pointer hover:opacity-80 transition-opacity'
                       />
+                    </Link>
+
+                    {/* Product Info - Clickable */}
+                    <div className='flex-1 min-w-0'>
+                      <Link href={`/products/${product.id}`} className='block'>
+                        <h2 className='font-semibold text-gray-900 hover:text-blue-600 transition-colors cursor-pointer'>
+                          {product.title}
+                        </h2>
+                      </Link>
+                      <p className='text-gray-500 text-sm'>${product.price.toFixed(2)} c/u</p>
+
+                      {/* Mobile: Stack quantity controls vertically */}
+                      <div className='mt-2 sm:hidden'>
+                        <div className='flex flex-col gap-2'>
+                          <div className='flex items-center gap-2'>
+                            <span className='text-gray-700 text-sm'>Cantidad:</span>
+                            <QuantitySelector
+                              value={quantity}
+                              onChange={(val) => handleQuantityChange(product.id, val, quantity)}
+                              min={1}
+                              max={product.stock}
+                            />
+                          </div>
+                          <span className='text-xs text-gray-500'>
+                            {product.stock > 0 ? `(+${product.stock} disponibles)` : '(Sin stock)'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Desktop: Keep horizontal layout */}
+                      <div className='hidden sm:flex items-center gap-2 mt-2'>
+                        <span className='text-gray-700 text-sm'>Cantidad:</span>
+                        <QuantitySelector
+                          value={quantity}
+                          onChange={(val) => handleQuantityChange(product.id, val, quantity)}
+                          min={1}
+                          max={product.stock}
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <div className='flex flex-col items-end'>
-                    <span className='font-semibold text-gray-900'>${(product.price * quantity).toFixed(2)}</span>
-                    <button
-                      onClick={() => deleteFromCart(product.id)}
-                      className='mt-2 text-red-500 hover:underline text-xs'
-                    >
-                      Quitar
-                    </button>
+
+                    {/* Price and Actions */}
+                    <div className='flex flex-col items-end gap-2'>
+                      <span className='font-semibold text-gray-900'>${(product.price * quantity).toFixed(2)}</span>
+                      <button
+                        onClick={() => deleteFromCart(product.id)}
+                        className='text-red-500 hover:underline text-xs'
+                      >
+                        Quitar
+                      </button>
+                    </div>
                   </div>
                 </li>
               ))}

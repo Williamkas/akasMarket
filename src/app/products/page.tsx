@@ -6,6 +6,7 @@ import ProductGrid from '../components/ProductGrid';
 import ProductSortOptions from '../components/ProductSortOptions';
 import ProductFilters from '../components/ProductFilters';
 import { useSearchParams } from 'next/navigation';
+import Breadcrumb from '../components/Breadcrumb';
 
 export default function ProductsPage() {
   const { fetchProducts, products, pagination, loading, error, filters, setFilters, hydrated } = useProductStore();
@@ -66,6 +67,7 @@ export default function ProductsPage() {
   return (
     <div className='min-h-screen bg-gray-100'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+        <Breadcrumb />
         {/* Título y cantidad de resultados */}
         <div className='mb-6'>
           <h1 className='text-2xl font-bold text-gray-900'>Productos</h1>

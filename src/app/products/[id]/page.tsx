@@ -6,9 +6,10 @@ import Link from 'next/link';
 import { getProductDetails } from '@/services/productService';
 import { useCartStore } from '@/store/useCartStore';
 import type { Product } from '@/services/productsService';
-import CustomDropdown from '@/app/components/CustomDropdown';
 import { useFavoritesStore, useFavoritesHydration } from '@/store/useFavoritesStore';
 import Image from 'next/image';
+import CustomDropdown from '@/app/components/CustomDropdown';
+import Breadcrumb from '../../components/Breadcrumb';
 
 const BackButton = () => (
   <button
@@ -94,7 +95,7 @@ export default function ProductDetail() {
 
   if (loading) {
     return (
-      <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
+      <div className='min-h-screen flex items-center justify-center'>
         <div className='text-center'>
           <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto'></div>
           <p className='mt-4 text-gray-600'>Cargando producto...</p>
@@ -105,7 +106,7 @@ export default function ProductDetail() {
 
   if (error || !product) {
     return (
-      <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
+      <div className='min-h-screen flex items-center justify-center'>
         <div className='text-center'>
           <h1 className='text-2xl font-bold text-gray-900 mb-4'>Product Not Found</h1>
           <p className='text-gray-600 mb-6'>{error || 'The product you are looking for does not exist.'}</p>
@@ -126,7 +127,7 @@ export default function ProductDetail() {
   // Don't render until cart is hydrated to prevent hydration mismatch
   if (!cartHydrated) {
     return (
-      <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
+      <div className='min-h-screen flex items-center justify-center'>
         <div className='text-center'>
           <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto'></div>
           <p className='mt-4 text-gray-600'>Cargando...</p>
@@ -146,7 +147,7 @@ export default function ProductDetail() {
   return (
     <div className='min-h-screen'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
-        {/* Botón Volver sobre fondo gris general, sin div extra */}
+        <Breadcrumb />
         <BackButton />
         <div className='bg-white rounded-lg shadow-sm overflow-hidden'>
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 p-8'>
@@ -222,20 +223,39 @@ export default function ProductDetail() {
                 </span>
               </div>
 
-              {/* Cantidad y stock */}
-              <div className='mb-2 flex items-center gap-2'>
-                <span className='text-gray-700'>Cantidad:</span>
-                <div className='w-44'>
-                  <CustomDropdown
-                    options={Array.from({ length: Math.min(availableStock, 10) }, (_, i) => i + 1)}
-                    value={quantity}
-                    onChange={setQuantity}
-                    renderOption={(val) => `${val} unidad${val > 1 ? 'es' : ''}`}
-                  />
+              {/* Cantidad y stock - Mobile: Column layout, Desktop: Row layout */}
+              <div className='mb-2'>
+                {/* Mobile: Column layout */}
+                <div className='sm:hidden flex flex-col gap-2'>
+                  <span className='text-gray-700'>Cantidad:</span>
+                  <div className='w-full'>
+                    <CustomDropdown
+                      options={Array.from({ length: Math.min(availableStock, 6) }, (_, i) => i + 1)}
+                      value={quantity}
+                      onChange={setQuantity}
+                      renderOption={(val) => `${val} unidad${val > 1 ? 'es' : ''}`}
+                    />
+                  </div>
+                  <span className='text-xs text-gray-500'>
+                    {availableStock > 0 ? `(+${availableStock} disponibles)` : '(Sin stock)'}
+                  </span>
                 </div>
-                <span className='text-xs text-gray-500'>
-                  {availableStock > 0 ? `(+${availableStock} disponibles)` : '(Sin stock)'}
-                </span>
+
+                {/* Desktop: Row layout */}
+                <div className='hidden sm:flex items-center gap-2'>
+                  <span className='text-gray-700'>Cantidad:</span>
+                  <div className='w-44'>
+                    <CustomDropdown
+                      options={Array.from({ length: Math.min(availableStock, 6) }, (_, i) => i + 1)}
+                      value={quantity}
+                      onChange={setQuantity}
+                      renderOption={(val) => `${val} unidad${val > 1 ? 'es' : ''}`}
+                    />
+                  </div>
+                  <span className='text-xs text-gray-500'>
+                    {availableStock > 0 ? `(+${availableStock} disponibles)` : '(Sin stock)'}
+                  </span>
+                </div>
               </div>
 
               {/* Botones CTA */}

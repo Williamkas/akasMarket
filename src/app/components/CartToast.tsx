@@ -26,7 +26,7 @@ export default function CartToast() {
 
   if (!mounted || !toast) return null;
   return (
-    <div className='fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg animate-fade-in'>
+    <div className='fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-green-600 text-white px-4 sm:px-6 py-3 rounded-lg shadow-lg animate-fade-in mx-2 sm:mx-0 w-[calc(100%-1rem)] sm:w-auto'>
       {toast}
     </div>
   );

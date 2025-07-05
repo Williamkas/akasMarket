@@ -8,12 +8,13 @@ export default function ToasterProvider() {
       position='bottom-center'
       duration={4000}
       toastOptions={{
-        className: 'text-sm font-medium',
+        className: 'text-sm font-medium mx-2 sm:mx-0 w-[calc(100%-1rem)] sm:w-auto',
         style: {
           background: '#10b981',
           color: 'white',
           borderRadius: '8px',
-          border: 'none'
+          border: 'none',
+          padding: '12px 16px'
         }
       }}
     />

@@ -78,23 +78,22 @@ const HeaderCSR = () => {
             </button>
           </form>
           <div className='flex items-center gap-4'>
-            <CartIcon />
             <Link href='/profile' className='bg-white text-blue-700 px-4 py-2 rounded-lg font-semibold'>
               Perfil
             </Link>
+            <CartIcon />
           </div>
         </div>
 
         {/* Mobile Layout */}
         <div className='md:hidden space-y-3'>
-          {/* Top row: Logo, Cart, Profile */}
+          {/* Top row: Logo, Profile, Cart */}
           <div className='flex items-center justify-between'>
             <Link href='/' className='flex items-center gap-2'>
               <Image src='/file.svg' alt='Logo' width={32} height={32} className='rounded-full bg-white' />
               <span className='text-white text-xl font-bold cursor-pointer'>Akas</span>
             </Link>
             <div className='flex items-center gap-3'>
-              <CartIcon />
               <Link href='/profile' className='text-white hover:text-gray-200 transition-colors'>
                 <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                   <path
@@ -105,6 +104,7 @@ const HeaderCSR = () => {
                   />
                 </svg>
               </Link>
+              <CartIcon />
             </div>
           </div>
 

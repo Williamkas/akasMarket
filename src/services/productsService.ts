@@ -48,7 +48,7 @@ export const getAllProducts = async (filters: ProductFilters = {}): Promise<GetA
 
   if (isServer()) {
     // Usar fetch con URL absoluta en server-side
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001';
     const res = await fetch(`${baseUrl}/api/products?${params.toString()}`);
     if (!res.ok) {
       throw new Error(`API error: ${res.status} ${res.statusText}`);
