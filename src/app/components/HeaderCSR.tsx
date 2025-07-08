@@ -34,7 +34,7 @@ const HeaderCSR = () => {
                 <span className='flex items-center justify-center' style={{ width: 40, height: 40 }}>
                   <LogoAkas width={100} height={100} />
                 </span>
-                <span className='text-white text-2xl font-bold cursor-pointer'>Akas</span>
+                <span className='text-white text-2xl font-bold cursor-pointer'>Akas Market</span>
               </Link>
             </div>
             <div className='flex-1 max-w-xl mx-8 relative'>
@@ -60,7 +60,7 @@ const HeaderCSR = () => {
               <span className='flex items-center justify-center' style={{ width: 40, height: 40 }}>
                 <LogoAkas width={100} height={100} />
               </span>
-              <span className='text-white text-2xl font-bold cursor-pointer'>Akas</span>
+              <span className='text-white text-2xl font-bold cursor-pointer'>Akas Market</span>
             </Link>
           </div>
           <form onSubmit={handleSubmit} className='flex-1 max-w-xl mx-8 relative'>
@@ -97,7 +97,7 @@ const HeaderCSR = () => {
               <span className='flex items-center justify-center' style={{ width: 32, height: 32 }}>
                 <LogoAkas width={80} height={80} />
               </span>
-              <span className='text-white text-xl font-bold cursor-pointer'>Akas</span>
+              <span className='text-white text-xl font-bold cursor-pointer'>Akas Market</span>
             </Link>
             <div className='flex items-center gap-3'>
               <Link href='/profile' className='text-white hover:text-gray-200 transition-colors'>
