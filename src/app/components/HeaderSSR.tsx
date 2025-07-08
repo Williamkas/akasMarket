@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import CartIconSSR from './CartIconSSR';
+import LogoAkas from './LogoAkas';
 
 const HeaderSSR = () => (
   <header className='bg-blue-700 py-4'>
@@ -9,7 +9,9 @@ const HeaderSSR = () => (
       <div className='hidden md:flex items-center justify-between'>
         <div className='flex items-center gap-3'>
           <Link href='/' className='flex items-center gap-2'>
-            <Image src='/file.svg' alt='Logo' width={40} height={40} className='rounded-full bg-white' />
+            <span className='flex items-center justify-center' style={{ width: 40, height: 40 }}>
+              <LogoAkas width={100} height={100} />
+            </span>
             <span className='text-white text-2xl font-bold cursor-pointer'>Akas</span>
           </Link>
         </div>
@@ -40,7 +42,9 @@ const HeaderSSR = () => (
         {/* Top row: Logo, Cart, Profile */}
         <div className='flex items-center justify-between'>
           <Link href='/' className='flex items-center gap-2'>
-            <Image src='/file.svg' alt='Logo' width={32} height={32} className='rounded-full bg-white' />
+            <span className='flex items-center justify-center' style={{ width: 32, height: 32 }}>
+              <LogoAkas width={28} height={28} />
+            </span>
             <span className='text-white text-xl font-bold cursor-pointer'>Akas</span>
           </Link>
           <div className='flex items-center gap-3'>

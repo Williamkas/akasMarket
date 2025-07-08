@@ -1,9 +1,9 @@
 'use client';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { useProductStore } from '../../store/useProductStore';
 import CartIcon from './CartIcon';
+import LogoAkas from './LogoAkas';
 
 const HeaderCSR = () => {
   const { filters, setFiltersAndSearch, clearFilters, fetchProducts, hydrated } = useProductStore();
@@ -31,7 +31,9 @@ const HeaderCSR = () => {
           <div className='hidden md:flex items-center justify-between'>
             <div className='flex items-center gap-3'>
               <Link href='/' className='flex items-center gap-2'>
-                <Image src='/file.svg' alt='Logo' width={40} height={40} className='rounded-full bg-white' />
+                <span className='flex items-center justify-center' style={{ width: 40, height: 40 }}>
+                  <LogoAkas width={100} height={100} />
+                </span>
                 <span className='text-white text-2xl font-bold cursor-pointer'>Akas</span>
               </Link>
             </div>
@@ -55,7 +57,9 @@ const HeaderCSR = () => {
         <div className='hidden md:flex items-center justify-between'>
           <div className='flex items-center gap-3'>
             <Link href='/' className='flex items-center gap-2'>
-              <Image src='/file.svg' alt='Logo' width={40} height={40} className='rounded-full bg-white' />
+              <span className='flex items-center justify-center' style={{ width: 40, height: 40 }}>
+                <LogoAkas width={100} height={100} />
+              </span>
               <span className='text-white text-2xl font-bold cursor-pointer'>Akas</span>
             </Link>
           </div>
@@ -90,7 +94,9 @@ const HeaderCSR = () => {
           {/* Top row: Logo, Profile, Cart */}
           <div className='flex items-center justify-between'>
             <Link href='/' className='flex items-center gap-2'>
-              <Image src='/file.svg' alt='Logo' width={32} height={32} className='rounded-full bg-white' />
+              <span className='flex items-center justify-center' style={{ width: 32, height: 32 }}>
+                <LogoAkas width={80} height={80} />
+              </span>
               <span className='text-white text-xl font-bold cursor-pointer'>Akas</span>
             </Link>
             <div className='flex items-center gap-3'>

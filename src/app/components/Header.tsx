@@ -62,11 +62,8 @@ const Header: React.FC = () => {
           {/* Logo */}
           <div className='flex items-center'>
             <Link href='/' className='flex items-center'>
-              <span
-                className='mr-3 bg-blue-600 rounded-full flex items-center justify-center'
-                style={{ width: 40, height: 40 }}
-              >
-                <LogoAkas width={28} height={28} />
+              <span className='mr-3 flex items-center justify-center' style={{ width: 40, height: 40 }}>
+                <LogoAkas width={32} height={32} />
               </span>
               <h1 className='text-xl font-semibold text-white'>Akas</h1>
             </Link>
