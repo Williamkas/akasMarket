@@ -1,4 +1,5 @@
 'use client';
+
 import HeaderCSR from '../components/HeaderCSR';
 
 export default function ProductsLayout({ children }: { children: React.ReactNode }) {

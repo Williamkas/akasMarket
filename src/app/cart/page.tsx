@@ -1,16 +1,21 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useCartStore } from '@/store/useCartStore';
 import Image from 'next/image';
 import QuantitySelector from '../components/QuantitySelector';
 import Breadcrumb from '../components/Breadcrumb';
+import { useAuth } from '@/store/useAuthStore';
+import AuthModal from '../components/AuthModal';
+import { toast } from 'sonner';
 
 const CartPage: React.FC = () => {
   const router = useRouter();
   const { items, addToCart, removeFromCart, deleteFromCart, hydrated } = useCartStore();
+  const { isAuthenticated } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Cambiar cantidad: setea la cantidad exacta
   const handleQuantityChange = (productId: string, newQty: number, currentQty: number) => {
@@ -23,6 +28,16 @@ const CartPage: React.FC = () => {
 
   const total = items.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
   const totalCount = items.reduce((acc, item) => acc + item.quantity, 0);
+
+  const handleCheckout = () => {
+    if (isAuthenticated) {
+      // TODO: Redirigir a la pasarela de pago
+      toast.success('Redirigiendo a la pasarela de pago...');
+      // router.push('/checkout');
+    } else {
+      setShowAuthModal(true);
+    }
+  };
 
   // Don't render until hydrated to prevent hydration mismatch
   if (!hydrated) {
@@ -143,11 +158,26 @@ const CartPage: React.FC = () => {
               Total ({totalCount} producto{totalCount !== 1 ? 's' : ''}):
             </div>
             <div className='text-2xl font-bold text-blue-600 mb-4'>${total.toFixed(2)}</div>
-            <button className='bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors'>
+            <button
+              onClick={handleCheckout}
+              className='bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors'
+            >
               Finalizar compra
             </button>
           </div>
         )}
+
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          onSuccess={() => {
+            setShowAuthModal(false);
+            // Aquí podrías redirigir a un gateway de pago
+            toast.success('¡Redirigiendo al pago...');
+          }}
+          title='Finalizar compra'
+          description='Necesitamos que inicies sesión para continuar con la compra.'
+        />
       </div>
     </div>
   );

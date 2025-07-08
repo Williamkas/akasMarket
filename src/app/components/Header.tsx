@@ -2,8 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import LogoAkas from './LogoAkas';
 import { useCartStore } from '../../store/useCartStore';
+import { useAuth } from '../../store/useAuthStore';
+import AuthModal from './AuthModal';
 
 const CartIcon = () => (
   <svg
@@ -48,53 +51,78 @@ const HeaderSearchBar = () => (
 );
 
 const Header: React.FC = () => {
+  const router = useRouter();
   const cartCount = useCartStore((state) => state.getCartCount());
+  const { isAuthenticated } = useAuth();
   const [mounted, setMounted] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  const handleAccountClick = () => {
+    if (isAuthenticated) {
+      router.push('/account');
+    } else {
+      setShowAuthModal(true);
+    }
+  };
+
   return (
-    <header className='bg-[#0052cc] text-white shadow-sm border-b border-gray-200'>
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-        <div className='flex flex-col sm:flex-row justify-between items-center h-24 gap-4'>
-          {/* Logo */}
-          <div className='flex items-center'>
-            <Link href='/' className='flex items-center'>
-              <span className='mr-3 flex items-center justify-center' style={{ width: 40, height: 40 }}>
-                <LogoAkas width={32} height={32} />
-              </span>
-              <h1 className='text-xl font-semibold text-white'>Akas</h1>
-            </Link>
-          </div>
-
-          {/* Buscador en el header */}
-          <HeaderSearchBar />
-
-          {/* Right side actions */}
-          <div className='flex items-center space-x-4'>
-            {/* Cart */}
-            <Link href='/cart' className='relative p-2 text-white hover:text-gray-200'>
-              <CartIcon />
-              {/* Cart badge - only show when count > 0 and mounted */}
-              {mounted && cartCount > 0 && (
-                <span className='absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center'>
-                  {cartCount}
+    <>
+      <header className='bg-[#0052cc] text-white shadow-sm border-b border-gray-200'>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+          <div className='flex flex-col sm:flex-row justify-between items-center h-24 gap-4'>
+            {/* Logo */}
+            <div className='flex items-center'>
+              <Link href='/' className='flex items-center'>
+                <span className='mr-3 flex items-center justify-center' style={{ width: 40, height: 40 }}>
+                  <LogoAkas width={32} height={32} />
                 </span>
-              )}
-            </Link>
+                <h1 className='text-xl font-semibold text-white'>Akas Market</h1>
+              </Link>
+            </div>
 
-            {/* Profile/Login */}
-            <Link href='/api/auth/logout'>
-              <button className='bg-white text-[#0052cc] px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors font-medium'>
-                Mi cuenta
+            {/* Buscador en el header */}
+            <HeaderSearchBar />
+
+            {/* Right side actions */}
+            <div className='flex items-center space-x-4'>
+              {/* Cart */}
+              <Link href='/cart' className='relative p-2 text-white hover:text-gray-200'>
+                <CartIcon />
+                {/* Cart badge - only show when count > 0 and mounted */}
+                {mounted && cartCount > 0 && (
+                  <span className='absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center'>
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
+
+              {/* Profile/Login */}
+              <button
+                onClick={handleAccountClick}
+                className='bg-white text-[#0052cc] px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors font-medium'
+              >
+                {isAuthenticated ? 'Mi cuenta' : 'Ingresar'}
               </button>
-            </Link>
+            </div>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={() => {
+          setShowAuthModal(false);
+          router.push('/account');
+        }}
+        title='Iniciar sesión'
+        description='Inicia sesión o crea una cuenta para acceder a tu perfil.'
+      />
+    </>
   );
 };
 

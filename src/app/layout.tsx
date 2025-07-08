@@ -6,6 +6,7 @@ import Footer from './components/Footer';
 import CartToast from './components/CartToast';
 import ToasterProvider from './components/ToasterProvider';
 import StoreHydration from './components/StoreHydration';
+import AuthHydration from './components/AuthHydration';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -18,27 +19,27 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Akas Market - Your Trusted Marketplace',
-  description: 'Discover amazing deals and premium products for your home and lifestyle'
+  title: 'Akas Market',
+  description: 'Your trusted marketplace for quality products'
 };
 
-export default function RootLayout({
-  children
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang='en'>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-100 text-gray-900 min-h-screen flex flex-col`}
-      >
-        <StoreHydration />
-        <CartToast />
-        <Suspense fallback='Loading...'>
-          <main className='flex-1'>{children}</main>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <ToasterProvider />
+        <AuthHydration />
+        <div className='flex flex-col min-h-screen'>
+          {/* <Header /> */}
+          <main className='flex-1'>
+            <Suspense fallback={<div>Loading...</div>}>
+              <StoreHydration />
+              {children}
+            </Suspense>
+          </main>
           <Footer />
-          <ToasterProvider />
-        </Suspense>
+        </div>
+        <CartToast />
       </body>
     </html>
   );
