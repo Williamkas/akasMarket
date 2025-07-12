@@ -1,42 +1,41 @@
 import { supabase } from '@/lib/supabase/client';
 import { handleError, handleSuccess } from '@/utils/apiHelpers';
-import { sendResetEmailSchema } from '@/lib/validation/schemas';
+import { resetPasswordSchema } from '@/lib/validation/schemas';
 
 /**
- * ✅ Endpoint para enviar un enlace de restablecimiento de contraseña.
+ * ✅ Endpoint para restablecer la contraseña con el token.
  */
 export async function POST(request: Request) {
   try {
     const body = await request.json();
 
     // 📌 Validar con Zod
-    const validation = sendResetEmailSchema.safeParse(body);
+    const validation = resetPasswordSchema.safeParse(body);
     if (!validation.success) {
       return handleError(400, 'Invalid data', validation.error.errors);
     }
 
-    const { email } = validation.data;
+    const { password, token } = validation.data;
 
-    // 📌 Verificación previa: Verificar si el correo o el nombre de usuario ya existe
-    const { data: existingEmail, error: emailError } = await supabase.rpc('get_user_by_email', { email: email });
-
-    if (!existingEmail) {
-      return handleError(400, 'User not registered');
+    // 📌 Setear la sesión con el token de recuperación
+    const { error: sessionError } = await supabase.auth.setSession({
+      access_token: token,
+      refresh_token: token
+    });
+    if (sessionError) {
+      return handleError(400, 'Invalid or expired token', sessionError.message);
     }
-    if (emailError) {
-      return handleError(500, 'Error during email verification', emailError.message);
-    }
 
-    // 📌 Enviar el enlace de restablecimiento de contraseña
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/reset-password?token={access_token}`
+    // 📌 Restablecer la contraseña
+    const { error } = await supabase.auth.updateUser({
+      password: password
     });
 
     if (error) {
-      return handleError(500, 'Error sending reset password email', error.message);
+      return handleError(500, 'Error updating password', error.message);
     }
 
-    return handleSuccess(200, 'Password reset email sent successfully. Please check your inbox.', null);
+    return handleSuccess(200, 'Password updated successfully', null);
   } catch (error) {
     return handleError(500, 'Internal Server Error', error);
   }

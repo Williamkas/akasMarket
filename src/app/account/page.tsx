@@ -2,12 +2,15 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '../../store/useAuthStore';
+import { useAuthStore } from '../../store/useAuthStore';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Breadcrumb from '../components/Breadcrumb';
+import HeaderCSR from '../components/HeaderCSR';
 
 const AccountPage: React.FC = () => {
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  const logout = useAuthStore((state) => state.logout);
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'profile' | 'favorites' | 'orders'>('profile');
 
@@ -22,13 +25,14 @@ const AccountPage: React.FC = () => {
     return null;
   }
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.push('/');
   };
 
   return (
     <div className='min-h-screen bg-gray-50'>
+      <HeaderCSR />
       <div className='max-w-4xl mx-auto px-4 py-8'>
         <Breadcrumb />
 
@@ -86,7 +90,7 @@ const AccountPage: React.FC = () => {
                     <input
                       type='text'
                       defaultValue={user?.name || ''}
-                      className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                      className='w-full px-3 py-2 border border-gray-300 rounded-lg text-black focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                     />
                   </div>
                   <div>
@@ -94,7 +98,7 @@ const AccountPage: React.FC = () => {
                     <input
                       type='text'
                       defaultValue={user?.lastname || ''}
-                      className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                      className='w-full px-3 py-2 border border-gray-300 rounded-lg text-black focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                     />
                   </div>
                   <div className='md:col-span-2'>
@@ -102,7 +106,7 @@ const AccountPage: React.FC = () => {
                     <input
                       type='email'
                       defaultValue={user?.email || ''}
-                      className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                      className='w-full px-3 py-2 border border-gray-300 rounded-lg text-black focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                       disabled
                     />
                   </div>

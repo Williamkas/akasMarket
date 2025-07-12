@@ -64,7 +64,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ id, title, price, imageUrl, s
           </svg>
         </button>
       </div>
-      <h2 className='text-lg font-semibold mt-2'>{title}</h2>
+      <h2 className='text-lg font-semibold text-black mt-2'>{title}</h2>
       {/* Precio destacado arriba de los tags */}
       <p className='text-blue-700 font-bold text-xl mt-2 mb-1'>${price.toFixed(2)}</p>
       {/* Tags de características */}

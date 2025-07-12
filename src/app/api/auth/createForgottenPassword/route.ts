@@ -1,42 +1,32 @@
 import { supabase } from '@/lib/supabase/client';
 import { handleError, handleSuccess } from '@/utils/apiHelpers';
-import { resetPasswordSchema } from '@/lib/validation/schemas';
+import { sendResetEmailSchema } from '@/lib/validation/schemas';
 
 /**
- * ✅ Endpoint para restablecer la contraseña con el token.
+ * ✅ Endpoint para enviar email de recuperación de contraseña.
  */
 export async function POST(request: Request) {
   try {
     const body = await request.json();
 
     // 📌 Validar con Zod
-    const validation = resetPasswordSchema.safeParse(body);
+    const validation = sendResetEmailSchema.safeParse(body);
     if (!validation.success) {
       return handleError(400, 'Invalid data', validation.error.errors);
     }
 
-    const { password, token } = validation.data;
+    const { email } = validation.data;
 
-    // 📌 Primero iniciar sesión con el token de recuperación
-    const { error: sessionError } = await supabase.auth.setSession({
-      access_token: token,
-      refresh_token: token
+    // 📌 Enviar email de recuperación de contraseña
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `http://localhost:3001/?reset=true`
     });
 
-    if (sessionError) {
-      return handleError(400, 'Invalid or expired token', sessionError.message);
+    if (error) {
+      return handleError(500, 'Error sending reset email', error.message);
     }
 
-    // 📌 Ahora actualizar la contraseña
-    const { error: updateError } = await supabase.auth.updateUser({
-      password
-    });
-
-    if (updateError) {
-      return handleError(500, 'Error updating password', updateError.message);
-    }
-
-    return handleSuccess(200, 'Password updated successfully', null);
+    return handleSuccess(200, 'Reset email sent successfully', null);
   } catch (error) {
     return handleError(500, 'Internal Server Error', error);
   }

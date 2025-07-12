@@ -1,26 +1,41 @@
-import { supabase } from '@/lib/supabase/client';
-import { handleError, handleSuccess } from '@/utils/apiHelpers';
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 
-/**
- * ✅ Endpoint para cerrar sesión.
- */
-export async function POST() {
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
+
+export async function POST(request: NextRequest) {
   try {
-    const { error } = await supabase.auth.signOut();
-
-    if (error) {
-      return handleError(500, 'Error logging out', error);
+    // Obtener el refreshToken de la cookie
+    const refreshToken = request.cookies.get('refreshToken')?.value;
+    if (!refreshToken) {
+      return NextResponse.json(
+        { success: true, message: 'No session to logout' },
+        {
+          status: 200,
+          headers: {
+            'Set-Cookie': 'refreshToken=; HttpOnly; Secure; Path=/; SameSite=Strict; Max-Age=0'
+          }
+        }
+      );
     }
 
-    // 📌 Crear la respuesta de éxito
-    const response = handleSuccess(200, 'Successfully logged out!', null);
+    // Cerrar sesión en Supabase
+    await supabase.auth.signOut();
 
-    // 📌 Expirar cookies de autenticación
-    response.headers.set('Set-Cookie', 'refreshToken=; HttpOnly; Secure; Path=/; Max-Age=0');
-    response.headers.append('Set-Cookie', 'accessToken=; HttpOnly; Secure; Path=/; Max-Age=0');
-
-    return response;
+    // Borrar la cookie
+    return NextResponse.json(
+      { success: true, message: 'Logged out' },
+      {
+        status: 200,
+        headers: {
+          'Set-Cookie': 'refreshToken=; HttpOnly; Secure; Path=/; SameSite=Strict; Max-Age=0'
+        }
+      }
+    );
   } catch (error) {
-    return handleError(500, 'Internal Server Error', error);
+    return NextResponse.json(
+      { success: false, error: { message: 'Logout failed', details: error?.message || error } },
+      { status: 500 }
+    );
   }
 }

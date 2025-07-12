@@ -4,16 +4,17 @@ import { useState, useEffect } from 'react';
 import { useProductStore } from '../../store/useProductStore';
 import CartIcon from './CartIcon';
 import LogoAkas from './LogoAkas';
-import { useAuth } from '../../store/useAuthStore';
+import { useAuth, useAuthStore } from '../../store/useAuthStore';
 import { useRouter } from 'next/navigation';
 import AuthModal from './AuthModal';
 
 const HeaderCSR = () => {
   const { filters, setFiltersAndSearch, clearFilters, fetchProducts, hydrated } = useProductStore();
   const [search, setSearch] = useState(filters.search || '');
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, redirectUrl } = useAuth();
   const router = useRouter();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const { setRedirectUrl, clearRedirectUrl } = useAuthStore();
 
   useEffect(() => {
     if (hydrated) {
@@ -32,6 +33,8 @@ const HeaderCSR = () => {
     if (isAuthenticated) {
       router.push('/account');
     } else {
+      // Store current path for redirect after login
+      setRedirectUrl(window.location.pathname);
       setShowAuthModal(true);
     }
   };
@@ -128,10 +131,19 @@ const HeaderCSR = () => {
       </header>
       <AuthModal
         isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
+        onClose={() => {
+          setShowAuthModal(false);
+          clearRedirectUrl();
+        }}
         onSuccess={() => {
           setShowAuthModal(false);
-          router.push('/account');
+          // Redirect to stored URL or default to account page
+          if (redirectUrl && redirectUrl !== '/') {
+            router.push(redirectUrl);
+          } else {
+            router.push('/account');
+          }
+          clearRedirectUrl();
         }}
         title='Iniciar sesión'
         description='Inicia sesión o crea una cuenta para acceder a tu perfil.'

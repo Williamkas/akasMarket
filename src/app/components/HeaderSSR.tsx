@@ -30,8 +30,8 @@ const HeaderSSR = () => (
           </button>
         </form>
         <div className='flex items-center gap-4'>
-          <Link href='/profile' className='bg-white text-blue-700 px-4 py-2 rounded-lg font-semibold'>
-            Mi cuenta
+          <Link href='/products?from=home' className='bg-white text-blue-700 px-4 py-2 rounded-lg font-semibold'>
+            Ingresar
           </Link>
           <CartIconSSR />
         </div>
@@ -48,7 +48,7 @@ const HeaderSSR = () => (
             <span className='text-white text-xl font-bold cursor-pointer'>Akas Market</span>
           </Link>
           <div className='flex items-center gap-3'>
-            <Link href='/profile' className='text-white hover:text-gray-200 transition-colors'>
+            <Link href='/products?from=home' className='text-white hover:text-gray-200 transition-colors'>
               <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                 <path
                   strokeLinecap='round'

@@ -12,9 +12,12 @@ interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   hydrated: boolean;
+  redirectUrl: string | null;
   setUser: (user: User | null) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
   setHydrated: () => void;
+  setRedirectUrl: (url: string | null) => void;
+  clearRedirectUrl: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -23,9 +26,19 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       isAuthenticated: false,
       hydrated: false,
+      redirectUrl: null,
       setUser: (user) => set({ user, isAuthenticated: !!user }),
-      logout: () => set({ user: null, isAuthenticated: false }),
-      setHydrated: () => set({ hydrated: true })
+      logout: async () => {
+        try {
+          await fetch('/api/auth/logout', { method: 'POST' });
+        } catch (e) {
+          // ignore
+        }
+        set({ user: null, isAuthenticated: false });
+      },
+      setHydrated: () => set({ hydrated: true }),
+      setRedirectUrl: (url) => set({ redirectUrl: url }),
+      clearRedirectUrl: () => set({ redirectUrl: null })
     }),
     {
       name: 'auth-storage',
@@ -36,6 +49,6 @@ export const useAuthStore = create<AuthState>()(
 
 // Hook para verificar si el usuario está autenticado
 export const useAuth = () => {
-  const { user, isAuthenticated, hydrated } = useAuthStore();
-  return { user, isAuthenticated, hydrated };
+  const { user, isAuthenticated, hydrated, redirectUrl } = useAuthStore();
+  return { user, isAuthenticated, hydrated, redirectUrl };
 };

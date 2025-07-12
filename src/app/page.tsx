@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { getAllProducts } from '../services/productsService';
 import Image from 'next/image';
-import HeaderSSR from './components/HeaderSSR';
+import HeaderWrapper from './components/HeaderWrapper';
+import ResetPasswordHandler from './components/ResetPasswordHandler';
+import AuthModalTrigger from './components/AuthModalTrigger';
 
 export default async function Home() {
   // Fetch productos recientes
@@ -21,7 +23,7 @@ export default async function Home() {
 
   return (
     <>
-      <HeaderSSR />
+      <HeaderWrapper />
       {/* Fila de categorías tipo abanico */}
       {featuredCategories.length > 0 && (
         <div className='relative z-20 bg-white shadow-sm border-b flex items-center h-10'>
@@ -103,6 +105,13 @@ export default async function Home() {
           </section>
         </div>
       </div>
+
+      {/* Client component para manejar tokens de reset de contraseña */}
+      <ResetPasswordHandler />
+      {/* Client component para abrir modal de reset de contraseña */}
+      <AuthModalTrigger />
+      {/* Debug component */}
+      {/* <DebugAuth /> */}
     </>
   );
 }

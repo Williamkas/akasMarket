@@ -7,7 +7,7 @@ import { useCartStore } from '@/store/useCartStore';
 import Image from 'next/image';
 import QuantitySelector from '../components/QuantitySelector';
 import Breadcrumb from '../components/Breadcrumb';
-import { useAuth } from '@/store/useAuthStore';
+import { useAuth, useAuthStore } from '@/store/useAuthStore';
 import AuthModal from '../components/AuthModal';
 import { toast } from 'sonner';
 
@@ -16,6 +16,7 @@ const CartPage: React.FC = () => {
   const { items, addToCart, removeFromCart, deleteFromCart, hydrated } = useCartStore();
   const { isAuthenticated } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const { setRedirectUrl, clearRedirectUrl } = useAuthStore();
 
   // Cambiar cantidad: setea la cantidad exacta
   const handleQuantityChange = (productId: string, newQty: number, currentQty: number) => {
@@ -31,10 +32,12 @@ const CartPage: React.FC = () => {
 
   const handleCheckout = () => {
     if (isAuthenticated) {
-      // TODO: Redirigir a la pasarela de pago
+      // Redirigir a la pasarela de pago
       toast.success('Redirigiendo a la pasarela de pago...');
-      // router.push('/checkout');
+      router.push('/checkout');
     } else {
+      // Store current path for redirect after login
+      setRedirectUrl('/cart');
       setShowAuthModal(true);
     }
   };
@@ -169,11 +172,15 @@ const CartPage: React.FC = () => {
 
         <AuthModal
           isOpen={showAuthModal}
-          onClose={() => setShowAuthModal(false)}
+          onClose={() => {
+            setShowAuthModal(false);
+            clearRedirectUrl();
+          }}
           onSuccess={() => {
             setShowAuthModal(false);
             // Aquí podrías redirigir a un gateway de pago
             toast.success('¡Redirigiendo al pago...');
+            clearRedirectUrl();
           }}
           title='Finalizar compra'
           description='Necesitamos que inicies sesión para continuar con la compra.'
