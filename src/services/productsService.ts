@@ -35,16 +35,15 @@ interface GetAllProductsResponse {
 }
 
 export const getAllProducts = async (filters: ProductFilters = {}): Promise<GetAllProductsResponse> => {
-  const params = new URLSearchParams({
-    page: String(filters.page ?? 1),
-    limit: String(filters.limit ?? 10),
-    search: filters.search ?? '',
-    sortBy: filters.sortBy ?? 'title',
-    order: filters.order ?? 'asc',
-    ...(filters.minPrice !== undefined ? { minPrice: String(filters.minPrice) } : {}),
-    ...(filters.maxPrice !== undefined ? { maxPrice: String(filters.maxPrice) } : {}),
-    ...(filters.categories && filters.categories.length > 0 ? { categories: filters.categories.join(',') } : {})
-  });
+  const params = new URLSearchParams();
+  if (filters.page) params.set('page', String(filters.page));
+  if (filters.limit) params.set('limit', String(filters.limit));
+  if (filters.search) params.set('search', filters.search);
+  if (filters.sortBy) params.set('sortBy', filters.sortBy);
+  if (filters.order) params.set('order', filters.order);
+  if (filters.minPrice !== undefined) params.set('minPrice', String(filters.minPrice));
+  if (filters.maxPrice !== undefined) params.set('maxPrice', String(filters.maxPrice));
+  if (filters.categories && filters.categories.length > 0) params.set('categories', filters.categories.join(','));
 
   if (isServer()) {
     // Usar fetch con URL absoluta en server-side
