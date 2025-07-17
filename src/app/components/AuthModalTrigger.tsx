@@ -2,13 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useAuthStore } from '../../store/useAuthStore';
 import AuthModal from './AuthModal';
 
 export default function AuthModalTrigger() {
   const [showModal, setShowModal] = useState(false);
   const searchParams = useSearchParams();
-  const { redirectUrl } = useAuthStore();
 
   useEffect(() => {
     const token = searchParams.get('token');
