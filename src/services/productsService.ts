@@ -36,11 +36,11 @@ interface GetAllProductsResponse {
 
 export const getAllProducts = async (filters: ProductFilters = {}): Promise<GetAllProductsResponse> => {
   const params = new URLSearchParams();
-  if (filters.page) params.set('page', String(filters.page));
-  if (filters.limit) params.set('limit', String(filters.limit));
+  params.set('page', String(filters.page ?? 1));
+  params.set('limit', String(filters.limit ?? 10));
+  params.set('sortBy', filters.sortBy ?? 'title');
+  params.set('order', filters.order ?? 'asc');
   if (filters.search) params.set('search', filters.search);
-  if (filters.sortBy) params.set('sortBy', filters.sortBy);
-  if (filters.order) params.set('order', filters.order);
   if (filters.minPrice !== undefined) params.set('minPrice', String(filters.minPrice));
   if (filters.maxPrice !== undefined) params.set('maxPrice', String(filters.maxPrice));
   if (filters.categories && filters.categories.length > 0) params.set('categories', filters.categories.join(','));
