@@ -4,7 +4,7 @@ import { useAuth, useAuthStore } from '@/store/useAuthStore';
 
 export default function DebugAuth() {
   const { isAuthenticated, hydrated, user } = useAuth();
-  const { setUser, logout } = useAuthStore();
+  const { logout } = useAuthStore();
 
   const handleLogout = () => {
     logout();

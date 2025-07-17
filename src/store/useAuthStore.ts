@@ -31,6 +31,7 @@ export const useAuthStore = create<AuthState>()(
       logout: async () => {
         try {
           await fetch('/api/auth/logout', { method: 'POST' });
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (e) {
           // ignore
         }

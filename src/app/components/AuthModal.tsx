@@ -29,7 +29,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { setRedirectUrl, clearRedirectUrl, setUser } = useAuthStore();
+  const { clearRedirectUrl, setUser } = useAuthStore();
   const { isAuthenticated } = useAuth();
 
   // Password visibility states
