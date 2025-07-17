@@ -33,8 +33,10 @@ export async function POST(request: NextRequest) {
       }
     );
   } catch (error) {
+    const errorMessage =
+      typeof error === 'object' && error && 'message' in error ? (error as { message: string }).message : String(error);
     return NextResponse.json(
-      { success: false, error: { message: 'Logout failed', details: error?.message || error } },
+      { success: false, error: { message: 'Logout failed', details: errorMessage } },
       { status: 500 }
     );
   }
