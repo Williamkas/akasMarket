@@ -5,7 +5,7 @@ import { useProductStore } from '../../store/useProductStore';
 import CartIcon from './CartIcon';
 import LogoAkas from './LogoAkas';
 import { useAuth, useAuthStore } from '../../store/useAuthStore';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import AuthModal from './AuthModal';
 
 const HeaderCSR = () => {
@@ -13,6 +13,7 @@ const HeaderCSR = () => {
   const [search, setSearch] = useState(filters.search || '');
   const { isAuthenticated, redirectUrl } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { setRedirectUrl, clearRedirectUrl } = useAuthStore();
 
@@ -24,9 +25,17 @@ const HeaderCSR = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    clearFilters();
-    setFiltersAndSearch({ search, page: 1 });
-    fetchProducts();
+    if (!search.trim()) return; // No submit if empty or whitespace
+    if (pathname !== '/products') {
+      // Redirige a /products?search=...
+      const params = new URLSearchParams();
+      if (search) params.set('search', search);
+      router.push(`/products${params.toString() ? `?${params.toString()}` : ''}`);
+    } else {
+      clearFilters();
+      setFiltersAndSearch({ search, page: 1 });
+      fetchProducts();
+    }
   };
 
   const handleAccountClick = () => {
@@ -59,7 +68,7 @@ const HeaderCSR = () => {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder='Buscar productos...'
-                className='w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 pr-10'
+                className='w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 pr-10 text-black'
               />
               <button
                 type='submit'
@@ -114,7 +123,7 @@ const HeaderCSR = () => {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder='Buscar productos...'
-                className='w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 pr-10'
+                className='w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 pr-10 text-black'
               />
               <button
                 type='submit'

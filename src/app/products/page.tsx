@@ -123,28 +123,24 @@ export default function ProductsPage() {
 
   return (
     <>
-      <div className='min-h-screen bg-gray-100'>
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
-          <Breadcrumb />
-          {/* Título y cantidad de resultados */}
-          <div className='mb-6'>
-            <h1 className='text-2xl font-bold text-gray-900'>Productos</h1>
-            <span className='text-gray-600 text-sm'>{pagination.totalCount} resultados encontrados</span>
+      <Breadcrumb />
+      {/* Título y cantidad de resultados */}
+      <div className='mb-6'>
+        <h1 className='text-2xl font-bold text-gray-900'>Productos</h1>
+        <span className='text-gray-600 text-sm'>{pagination.totalCount} resultados encontrados</span>
+      </div>
+      <div className='flex flex-col lg:flex-row gap-8 items-start'>
+        {/* Sidebar */}
+        <aside className='w-full lg:w-1/4'>
+          <div className='sticky top-4 space-y-6'>
+            <ProductSortOptions label='Ordenar por:' />
+            <ProductFilters categories={categories} label='Filtrar por:' />
           </div>
-          <div className='flex flex-col lg:flex-row gap-8 items-start'>
-            {/* Sidebar */}
-            <aside className='w-full lg:w-1/4'>
-              <div className='sticky top-4 space-y-6'>
-                <ProductSortOptions label='Ordenar por:' />
-                <ProductFilters categories={categories} label='Filtrar por:' />
-              </div>
-            </aside>
-            {/* Main Content */}
-            <section className='w-full lg:w-3/4 flex-1 space-y-6'>
-              <ProductGrid products={products} pagination={pagination} loading={loading} error={error} />
-            </section>
-          </div>
-        </div>
+        </aside>
+        {/* Main Content */}
+        <section className='w-full lg:w-3/4 flex-1 space-y-6'>
+          <ProductGrid products={products} pagination={pagination} loading={loading} error={error} />
+        </section>
       </div>
 
       <AuthModal

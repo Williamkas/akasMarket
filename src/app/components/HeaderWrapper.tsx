@@ -5,20 +5,14 @@ import HeaderSSR from './HeaderSSR';
 import HeaderCSR from './HeaderCSR';
 
 export default function HeaderWrapper() {
-  const { isAuthenticated, hydrated, user } = useAuth();
+  const { isAuthenticated, hydrated } = useAuth();
 
-  console.log('HeaderWrapper state:', { isAuthenticated, hydrated, user });
-
-  // Show loading state while hydrating
-  if (!hydrated) {
+  // Show SSR header while hydrating or if not authenticated
+  // The HeaderSSR now includes IngresarButton which handles authentication logic
+  if (!hydrated || !isAuthenticated) {
     return <HeaderSSR />;
   }
 
   // If user is authenticated, show CSR header with "Mi cuenta"
-  if (isAuthenticated) {
-    return <HeaderCSR />;
-  }
-
-  // If user is not authenticated, show SSR header with "Ingresar"
-  return <HeaderSSR />;
+  return <HeaderCSR />;
 }
