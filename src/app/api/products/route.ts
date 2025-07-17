@@ -20,7 +20,7 @@ export async function GET(request: Request) {
   }
 
   // 📌 Validación de los parámetros de consulta
-  const validation = productsSchema.safeParse({
+  const paramsToValidate = {
     page: searchParams.get('page') ?? '1',
     limit: searchParams.get('limit') ?? '10',
     search: searchParams.get('search') ?? '',
@@ -29,9 +29,12 @@ export async function GET(request: Request) {
     minPrice: searchParams.get('minPrice') ?? undefined,
     maxPrice: searchParams.get('maxPrice') ?? undefined,
     categories: categoriesParam
-  });
+  };
+  console.log('API /api/products params:', paramsToValidate);
+  const validation = productsSchema.safeParse(paramsToValidate);
 
   if (!validation.success) {
+    console.error('API /api/products validation error:', validation.error);
     return handleError(400, 'Invalid query parameters', validation.error.errors);
   }
 
