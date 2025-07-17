@@ -1,20 +1,24 @@
 import Link from 'next/link';
-import { getAllProducts } from '../services/productsService';
+import { supabase } from '@/lib/supabase/client';
 import Image from 'next/image';
 import HeaderWrapper from './components/HeaderWrapper';
 import ResetPasswordHandler from './components/ResetPasswordHandler';
 import AuthModalTrigger from './components/AuthModalTrigger';
 
 export default async function Home() {
-  // Fetch productos recientes
-  const recentRes = await getAllProducts({ sortBy: 'created_at', order: 'desc', limit: 6 });
-  const recentProducts = Array.isArray(recentRes.data) ? recentRes.data : [];
+  // Fetch productos recientes directamente desde Supabase
+  const { data } = await supabase
+    .from('products')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(6);
+  const recentProducts = data ?? [];
 
   // Obtener categorías destacadas de los productos recientes
   const categorySet = new Set<string>();
   recentProducts.forEach((p) => {
     if (Array.isArray(p.categories)) {
-      p.categories.forEach((cat) => {
+      p.categories.forEach((cat: string) => {
         if (cat && cat !== 'Uncategorized') categorySet.add(cat);
       });
     }
@@ -36,7 +40,7 @@ export default async function Home() {
                 </svg>
               </button>
               <div className='absolute left-0 top-full w-48 bg-white rounded-lg shadow-lg border opacity-0 group-hover:opacity-100 group-hover:visible invisible transition-opacity duration-200 flex flex-col py-2 z-30'>
-                {featuredCategories.map((cat) => (
+                {featuredCategories.map((cat: string) => (
                   <Link
                     key={cat}
                     href={`/products?categories=${encodeURIComponent(cat)}`}
@@ -93,7 +97,7 @@ export default async function Home() {
                   <h3 className='text-lg font-semibold text-gray-900'>{product.title}</h3>
                   <p className='text-blue-700 font-bold mt-1 mb-2'>${product.price.toFixed(2)}</p>
                   <div className='flex flex-wrap gap-2'>
-                    {product.categories?.map((cat) => (
+                    {product.categories?.map((cat: string) => (
                       <span key={cat} className='bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full'>
                         {cat}
                       </span>

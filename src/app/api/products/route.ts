@@ -30,11 +30,9 @@ export async function GET(request: Request) {
     maxPrice: searchParams.get('maxPrice') ?? undefined,
     categories: categoriesParam
   };
-  console.log('API /api/products params:', paramsToValidate);
   const validation = productsSchema.safeParse(paramsToValidate);
 
   if (!validation.success) {
-    console.error('API /api/products validation error:', validation.error);
     return handleError(400, 'Invalid query parameters', validation.error.errors);
   }
 
