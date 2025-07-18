@@ -28,7 +28,7 @@ export default function CustomDropdown<T>({ options, value, onChange, renderOpti
     <div className='relative' ref={ref}>
       <button
         type='button'
-        className='w-full flex items-center justify-between bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-800 font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all'
+        className='w-full flex items-center justify-between bg-white border border-gray-200 rounded-lg px-4 py-2 text-black font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all'
         onClick={() => setOpen((v) => !v)}
         aria-haspopup='listbox'
         aria-expanded={open}
@@ -39,19 +39,19 @@ export default function CustomDropdown<T>({ options, value, onChange, renderOpti
           style={{ display: 'inline-block', transform: open ? 'rotateX(180deg)' : 'rotateX(0deg)' }}
         >
           {/* Chevron SVG */}
-          <svg className='w-5 h-5 text-gray-500' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+          <svg className='w-5 h-5 text-black' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
             <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
           </svg>
         </span>
       </button>
       {open && (
-        <div className='absolute left-0 w-full mt-1 bg-gray-100 rounded-lg shadow-lg z-10' style={{ marginTop: 4 }}>
+        <div className='absolute left-0 w-full mt-1 bg-white rounded-lg shadow-lg z-10' style={{ marginTop: 4 }}>
           <ul className='py-1'>
             {options.map((option, idx) => (
               <li
                 key={getKey ? getKey(option) : idx}
-                className={`px-4 py-2 cursor-pointer rounded ${
-                  option === value ? 'bg-gray-200 font-semibold' : 'hover:bg-gray-300'
+                className={`px-4 py-2 cursor-pointer rounded text-black ${
+                  option === value ? 'bg-gray-200 font-semibold' : 'hover:bg-gray-100'
                 }`}
                 onClick={() => {
                   onChange(option);

@@ -10,6 +10,7 @@ import { useFavoritesStore, useFavoritesHydration } from '@/store/useFavoritesSt
 import Image from 'next/image';
 import CustomDropdown from '@/app/components/CustomDropdown';
 import Breadcrumb from '../../components/Breadcrumb';
+import { toast } from 'sonner';
 
 const BackButton = () => (
   <button
@@ -88,8 +89,24 @@ export default function ProductDetail() {
   const handleFavoriteClick = () => {
     if (favorite) {
       removeFavorite(productId);
+      toast('Eliminaste el producto de Mis favoritos.', {
+        style: { background: '#222', color: 'white' },
+        duration: 4000
+      });
     } else {
       addFavorite(productId);
+      toast.success(
+        <span>
+          Se agregó a Mis favoritos.{' '}
+          <Link href='/account?tab=favorites' className='underline text-white font-semibold ml-2'>
+            Ir a Mis favoritos
+          </Link>
+        </span>,
+        {
+          style: { background: '#10b981', color: 'white' },
+          duration: 4000
+        }
+      );
     }
   };
 

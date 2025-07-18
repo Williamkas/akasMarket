@@ -7,19 +7,45 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Breadcrumb from '../components/Breadcrumb';
 import HeaderCSR from '../components/HeaderCSR';
+import FavoritesList from '../components/FavoritesList';
+import { useSearchParams } from 'next/navigation';
+import { useFavoritesHydration } from '../../store/useFavoritesStore';
+import { useCartStore } from '../../store/useCartStore';
+import { useProductStore } from '../../store/useProductStore';
 
 const AccountPage: React.FC = () => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, hydrated: authHydrated } = useAuth();
   const logout = useAuthStore((state) => state.logout);
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'profile' | 'favorites' | 'orders'>('profile');
+  const searchParams = useSearchParams();
+  const initialTab = (searchParams.get('tab') as 'profile' | 'favorites' | 'orders') || 'profile';
+  const [activeTab, setActiveTab] = useState<'profile' | 'favorites' | 'orders'>(initialTab);
+  useFavoritesHydration();
+  const { hydrated: cartHydrated } = useCartStore();
+  const { products, fetchProducts } = useProductStore();
 
-  // Redirect if not authenticated
   React.useEffect(() => {
-    if (!isAuthenticated) {
+    if (authHydrated && !isAuthenticated) {
       router.push('/');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, authHydrated, router]);
+
+  // Sincroniza el tab activo con la query
+  React.useEffect(() => {
+    const tab = (searchParams.get('tab') as 'profile' | 'favorites' | 'orders') || 'profile';
+    setActiveTab(tab);
+  }, [searchParams]);
+
+  // Si los productos están vacíos, haz fetch al entrar a la página o al cambiar a favoritos
+  React.useEffect(() => {
+    if (activeTab === 'favorites' && products.length === 0) {
+      fetchProducts();
+    }
+  }, [activeTab, products.length, fetchProducts]);
+
+  if (!authHydrated || !cartHydrated) {
+    return null;
+  }
 
   if (!isAuthenticated) {
     return null;
@@ -28,6 +54,11 @@ const AccountPage: React.FC = () => {
   const handleLogout = async () => {
     await logout();
     router.push('/');
+  };
+
+  const handleTabChange = (tab: 'profile' | 'favorites' | 'orders') => {
+    setActiveTab(tab);
+    router.replace(`/account?tab=${tab}`);
   };
 
   return (
@@ -47,7 +78,7 @@ const AccountPage: React.FC = () => {
           <div className='border-b border-gray-200'>
             <nav className='flex space-x-8 px-6'>
               <button
-                onClick={() => setActiveTab('profile')}
+                onClick={() => handleTabChange('profile')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'profile'
                     ? 'border-blue-500 text-blue-600'
@@ -57,7 +88,7 @@ const AccountPage: React.FC = () => {
                 Mis datos
               </button>
               <button
-                onClick={() => setActiveTab('favorites')}
+                onClick={() => handleTabChange('favorites')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'favorites'
                     ? 'border-blue-500 text-blue-600'
@@ -67,7 +98,7 @@ const AccountPage: React.FC = () => {
                 Mis favoritos
               </button>
               <button
-                onClick={() => setActiveTab('orders')}
+                onClick={() => handleTabChange('orders')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'orders'
                     ? 'border-blue-500 text-blue-600'
@@ -123,31 +154,7 @@ const AccountPage: React.FC = () => {
             {activeTab === 'favorites' && (
               <div className='space-y-6'>
                 <h2 className='text-xl font-semibold text-gray-900'>Mis Favoritos</h2>
-                <div className='text-center py-12'>
-                  <svg
-                    className='mx-auto h-12 w-12 text-gray-400'
-                    fill='none'
-                    viewBox='0 0 24 24'
-                    stroke='currentColor'
-                  >
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth={2}
-                      d='M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z'
-                    />
-                  </svg>
-                  <h3 className='mt-2 text-sm font-medium text-gray-900'>No tienes favoritos</h3>
-                  <p className='mt-1 text-sm text-gray-500'>Comienza agregando productos a tus favoritos.</p>
-                  <div className='mt-6'>
-                    <Link
-                      href='/products'
-                      className='inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700'
-                    >
-                      Ver productos
-                    </Link>
-                  </div>
-                </div>
+                <FavoritesList />
               </div>
             )}
 
@@ -185,10 +192,10 @@ const AccountPage: React.FC = () => {
         </div>
 
         {/* Logout Button */}
-        <div className='bg-white rounded-lg shadow-sm p-6'>
+        <div className='flex justify-end mt-8'>
           <button
             onClick={handleLogout}
-            className='w-full px-4 py-2 text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors'
+            className='px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors text-sm font-medium border border-gray-200'
           >
             Cerrar sesión
           </button>
