@@ -50,8 +50,6 @@ export default function ProductsPage() {
 
   // Check if user came from home and is not authenticated
   useEffect(() => {
-    console.log('Auth check effect:', { hydrated, isAuthenticated });
-
     if (hydrated && !isAuthenticated) {
       // Check URL parameter first (more reliable)
       const fromHomeParam = searchParams.get('from');

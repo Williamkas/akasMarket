@@ -137,7 +137,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
         console.log('User set in store:', result.data.user);
       }
 
-      toast.success('✅ Inicio de sesión exitoso');
+      toast.success('Inicio de sesión exitoso');
 
       // Small delay to ensure state is updated before calling onSuccess
       setTimeout(() => {
