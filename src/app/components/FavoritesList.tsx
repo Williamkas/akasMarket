@@ -10,13 +10,33 @@ interface FavoritesListProps {
   showRemoveToast?: boolean;
 }
 
+const SkeletonCard = () => (
+  <li className='flex items-center bg-white rounded-lg shadow p-4 animate-pulse gap-4'>
+    <div className='w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0' />
+    <div className='min-w-0 flex-1 pr-10'>
+      <div className='h-5 bg-gray-200 rounded w-2/3 mb-2'></div>
+      <div className='h-4 bg-gray-100 rounded w-1/3'></div>
+    </div>
+  </li>
+);
+
 const FavoritesList: React.FC<FavoritesListProps> = ({ showRemoveToast = true }) => {
   const { favorites, removeFavorite } = useFavoritesStore();
-  const { products } = useProductStore();
+  const { products, loading } = useProductStore();
   const [removingId, setRemovingId] = useState<string | null>(null);
   const router = useRouter();
 
   const favoriteProducts = products.filter((p) => favorites.includes(p.id));
+
+  if (loading) {
+    // Muestra 2 skeletons como ejemplo
+    return (
+      <ul className='space-y-4'>
+        <SkeletonCard />
+        <SkeletonCard />
+      </ul>
+    );
+  }
 
   if (favoriteProducts.length === 0) {
     return (
@@ -43,20 +63,6 @@ const FavoritesList: React.FC<FavoritesListProps> = ({ showRemoveToast = true })
     );
   }
 
-  const handleRemove = (productId: string) => {
-    setRemovingId(productId);
-    setTimeout(() => {
-      removeFavorite(productId);
-      setRemovingId(null);
-      if (showRemoveToast) {
-        toast('Listo, lo eliminaste de Mis favoritos.', {
-          style: { background: '#222', color: 'white' },
-          duration: 4000
-        });
-      }
-    }, 400); // Duration of the animation
-  };
-
   return (
     <ul className='space-y-4'>
       {favoriteProducts.map((product) => (
@@ -69,7 +75,19 @@ const FavoritesList: React.FC<FavoritesListProps> = ({ showRemoveToast = true })
           <button
             aria-label='Eliminar de favoritos'
             className='absolute right-4 top-4 text-red-500 hover:text-red-700 z-10'
-            onClick={() => handleRemove(product.id)}
+            onClick={() => {
+              setRemovingId(product.id);
+              setTimeout(() => {
+                removeFavorite(product.id);
+                setRemovingId(null);
+                if (showRemoveToast) {
+                  toast('Listo, lo eliminaste de Mis favoritos.', {
+                    style: { background: '#222', color: 'white' },
+                    duration: 4000
+                  });
+                }
+              }, 400);
+            }}
             disabled={removingId === product.id}
           >
             <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
@@ -93,7 +111,6 @@ const FavoritesList: React.FC<FavoritesListProps> = ({ showRemoveToast = true })
                 {product.title}
               </h3>
               <p className='text-blue-700 font-bold mt-1 mb-2'>${product.price?.toFixed(2)}</p>
-              {/* Categorías eliminadas para simplificar la card */}
             </div>
           </button>
         </li>
