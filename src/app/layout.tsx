@@ -3,7 +3,6 @@ import { Suspense } from 'react';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import Footer from './components/Footer';
-import CartToast from './components/CartToast';
 import ToasterProvider from './components/ToasterProvider';
 import StoreHydration from './components/StoreHydration';
 import AuthHydration from './components/AuthHydration';
@@ -39,7 +38,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </main>
           <Footer />
         </div>
-        <CartToast />
       </body>
     </html>
   );

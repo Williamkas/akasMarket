@@ -15,7 +15,7 @@ const HeaderSSR = () => (
             <span className='text-white text-2xl font-bold cursor-pointer'>Akas Market</span>
           </Link>
         </div>
-        <form action='/products' method='GET' className='flex-1 max-w-xl mx-8 relative'>
+        <form id='ssr-search-form' action='/products' method='GET' className='flex-1 max-w-xl mx-8 relative'>
           <input
             type='text'
             name='search'

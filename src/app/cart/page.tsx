@@ -17,6 +17,7 @@ const CartPage: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { setRedirectUrl, clearRedirectUrl } = useAuthStore();
+  const [removingId, setRemovingId] = useState<string | null>(null);
 
   // Cambiar cantidad: setea la cantidad exacta
   const handleQuantityChange = (productId: string, newQty: number, currentQty: number) => {
@@ -85,7 +86,12 @@ const CartPage: React.FC = () => {
             <h1 className='text-2xl font-bold text-gray-900 mb-6'>Mi Carrito</h1>
             <ul className='divide-y divide-gray-200'>
               {items.map(({ product, quantity }) => (
-                <li key={product.id} className='py-4'>
+                <li
+                  key={product.id}
+                  className={`py-4 transition-all duration-400 relative overflow-hidden ${
+                    removingId === product.id ? 'translate-x-32 opacity-0' : 'opacity-100'
+                  }`}
+                >
                   <div className='flex flex-col sm:flex-row gap-4'>
                     {/* Product Image - Clickable */}
                     <Link href={`/products/${product.id}`} className='flex-shrink-0'>
@@ -141,8 +147,19 @@ const CartPage: React.FC = () => {
                     <div className='flex flex-col items-end gap-2'>
                       <span className='font-semibold text-gray-900'>${(product.price * quantity).toFixed(2)}</span>
                       <button
-                        onClick={() => deleteFromCart(product.id)}
+                        onClick={() => {
+                          setRemovingId(product.id);
+                          setTimeout(() => {
+                            deleteFromCart(product.id);
+                            setRemovingId(null);
+                            toast('Listo! Eliminaste el producto.', {
+                              style: { background: '#22c55e', color: 'white' },
+                              duration: 5000
+                            });
+                          }, 400);
+                        }}
                         className='text-red-500 hover:underline text-xs'
+                        disabled={removingId === product.id}
                       >
                         Quitar
                       </button>

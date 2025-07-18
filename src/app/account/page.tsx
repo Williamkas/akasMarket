@@ -44,7 +44,17 @@ const AccountPage: React.FC = () => {
   }, [activeTab, products.length, fetchProducts]);
 
   if (!authHydrated || !cartHydrated) {
-    return null;
+    return (
+      <>
+        <HeaderCSR />
+        <div className='min-h-screen bg-gray-100 flex items-center justify-center'>
+          <div className='text-center'>
+            <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto'></div>
+            <p className='mt-4 text-gray-600'>Cargando...</p>
+          </div>
+        </div>
+      </>
+    );
   }
 
   if (!isAuthenticated) {
@@ -68,9 +78,17 @@ const AccountPage: React.FC = () => {
         <Breadcrumb />
 
         {/* Header */}
-        <div className='bg-white rounded-lg shadow-sm p-6 mb-6'>
-          <h1 className='text-3xl font-bold text-gray-900 mb-2'>Mi Cuenta</h1>
-          <p className='text-gray-600'>Bienvenido, {user?.name || 'Usuario'}</p>
+        <div className='bg-white rounded-lg shadow-sm p-6 mb-6 flex justify-between items-center'>
+          <div>
+            <h1 className='text-3xl font-bold text-gray-900 mb-2'>Mi Cuenta</h1>
+            <p className='text-gray-600'>Bienvenido, {user?.name || 'Usuario'}</p>
+          </div>
+          <button
+            onClick={handleLogout}
+            className='px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors text-sm font-medium border border-gray-200'
+          >
+            Cerrar sesión
+          </button>
         </div>
 
         {/* Navigation Tabs */}
@@ -189,16 +207,6 @@ const AccountPage: React.FC = () => {
               </div>
             )}
           </div>
-        </div>
-
-        {/* Logout Button */}
-        <div className='flex justify-end mt-8'>
-          <button
-            onClick={handleLogout}
-            className='px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors text-sm font-medium border border-gray-200'
-          >
-            Cerrar sesión
-          </button>
         </div>
       </div>
     </div>

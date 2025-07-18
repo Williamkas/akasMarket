@@ -82,8 +82,8 @@ const FavoritesList: React.FC<FavoritesListProps> = ({ showRemoveToast = true })
                 setRemovingId(null);
                 if (showRemoveToast) {
                   toast('Listo, lo eliminaste de Mis favoritos.', {
-                    style: { background: '#222', color: 'white' },
-                    duration: 4000
+                    style: { background: '#22c55e', color: 'white' },
+                    duration: 5000
                   });
                 }
               }, 400);

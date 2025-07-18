@@ -74,15 +74,28 @@ export default function ProductDetail() {
       for (let i = 0; i < quantity; i++) {
         addToCart(product);
       }
+      toast(
+        <span>
+          ¡Producto agregado al carrito!
+          <a
+            href='/cart'
+            className='underline text-white hover:text-green-100 ml-2 font-medium'
+            style={{ textDecoration: 'underline' }}
+          >
+            Ir al carrito
+          </a>
+        </span>,
+        {
+          style: { background: '#22c55e', color: 'white' },
+          duration: 5000
+        }
+      );
     }
   };
 
   const handleBuyNow = () => {
     if (product) {
-      for (let i = 0; i < quantity; i++) {
-        addToCart(product);
-      }
-      router.push('/cart');
+      router.push(`/checkout?buyNow=1&id=${product.id}&qty=${quantity}`);
     }
   };
 

@@ -199,27 +199,29 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({ categories, label }) =>
         </div>
 
         {/* Categories */}
-        <div className='space-y-3'>
-          <h4 className='font-semibold text-gray-900'>Categorías</h4>
-          <div className='space-y-2 max-h-64 overflow-y-auto'>
-            {categories.map((category) => (
-              <label
-                key={category}
-                className='flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded-md transition-colors'
-              >
-                <input
-                  type='checkbox'
-                  name='categories'
-                  value={category}
-                  checked={selectedCategories.includes(category)}
-                  onChange={handleCategoryChange}
-                  className='h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded'
-                />
-                <span className='text-gray-700 text-sm'>{category}</span>
-              </label>
-            ))}
+        {categories.length > 0 && (
+          <div className='space-y-3'>
+            <h4 className='font-semibold text-gray-900'>Categorías</h4>
+            <div className='space-y-2 max-h-64 overflow-y-auto'>
+              {categories.map((category) => (
+                <label
+                  key={category}
+                  className='flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded-md transition-colors'
+                >
+                  <input
+                    type='checkbox'
+                    name='categories'
+                    value={category}
+                    checked={selectedCategories.includes(category)}
+                    onChange={handleCategoryChange}
+                    className='h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded'
+                  />
+                  <span className='text-gray-700 text-sm'>{category}</span>
+                </label>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

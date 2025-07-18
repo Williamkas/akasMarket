@@ -7,11 +7,7 @@ import AuthModalTrigger from './components/AuthModalTrigger';
 
 export default async function Home() {
   // Fetch productos recientes directamente desde Supabase
-  const { data } = await supabase
-    .from('products')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(6);
+  const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false }).limit(6);
   const recentProducts = data ?? [];
 
   // Obtener categorías destacadas de los productos recientes
@@ -24,6 +20,24 @@ export default async function Home() {
     }
   });
   const featuredCategories = Array.from(categorySet).slice(0, 6);
+
+  // Si necesitas esperar hidratación o datos, muestra el loader
+  // Por ejemplo, si usas un store de auth o productos, puedes chequear hydrated aquí
+  // if (!hydrated) { ... }
+  // Para este ejemplo, solo muestro el loader si recentProducts está undefined (ajusta según tu lógica real)
+  if (!recentProducts) {
+    return (
+      <>
+        <HeaderWrapper />
+        <div className='min-h-screen bg-gray-100 flex items-center justify-center'>
+          <div className='text-center'>
+            <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto'></div>
+            <p className='mt-4 text-gray-600'>Cargando...</p>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
