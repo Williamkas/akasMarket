@@ -8,6 +8,23 @@ interface User {
   email: string;
   name?: string;
   lastname?: string;
+  user_metadata?: {
+    name?: string;
+    lastname?: string;
+    email?: string;
+  };
+}
+
+interface UserData {
+  id: string;
+  email: string;
+  name?: string;
+  lastname?: string;
+  user_metadata?: {
+    name?: string;
+    lastname?: string;
+    email?: string;
+  };
 }
 
 interface AuthState {
@@ -15,7 +32,7 @@ interface AuthState {
   isAuthenticated: boolean;
   hydrated: boolean;
   redirectUrl: string | null;
-  setUser: (user: User | null) => void;
+  setUser: (user: UserData | null) => void;
   logout: () => Promise<void>;
   setHydrated: () => void;
   setRedirectUrl: (url: string | null) => void;
@@ -29,7 +46,24 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       hydrated: false,
       redirectUrl: null,
-      setUser: (user) => set({ user, isAuthenticated: !!user }),
+      setUser: (userData) => {
+        if (!userData) {
+          set({ user: null, isAuthenticated: false });
+          return;
+        }
+
+        // Extraer datos de user_metadata si existen
+        const userMetadata = userData.user_metadata || {};
+        const processedUser: User = {
+          id: userData.id,
+          email: userData.email,
+          name: userMetadata.name || userData.name,
+          lastname: userMetadata.lastname || userData.lastname,
+          user_metadata: userMetadata
+        };
+
+        set({ user: processedUser, isAuthenticated: true });
+      },
       logout: async () => {
         try {
           await fetch('/api/auth/logout', { method: 'POST' });

@@ -23,9 +23,9 @@ const TestConnection = () => {
     const checkConnection = async () => {
       const success = await supabaseConnection();
       if (success) {
-        console.log('¡Conexión a Supabase exitosa!');
+        // ¡Conexión a Supabase exitosa!
       } else {
-        console.log('Hubo un problema con la conexión.');
+        // Hubo un problema con la conexión.
       }
     };
 

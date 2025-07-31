@@ -55,7 +55,7 @@ export default function ProductsPage() {
       const loginFromHome = searchParams.get('loginFromHome');
 
       if (loginFromHome === '1' && !hasOpenedModal.current) {
-        console.log('Opening auth modal from home');
+        // Opening auth modal from home
         setRedirectUrl('/products');
 
         // Clean up the URL parameter

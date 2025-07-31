@@ -149,7 +149,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
           }
         }
         // --- Fin migración ---
-        console.log('User set in store:', result.data.user);
+        // User set in store
       }
 
       toast.success('Inicio de sesión exitoso');

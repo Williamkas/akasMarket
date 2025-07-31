@@ -12,12 +12,7 @@ const CartIconSSR = () => {
     setMounted(true);
   }, []);
 
-  // Debug: verificar que el contador se actualiza
-  useEffect(() => {
-    if (mounted) {
-      console.log('CartIconSSR - Cart count:', cartCount);
-    }
-  }, [cartCount, mounted]);
+  // CartIconSSR - Cart count
 
   return (
     <Link href='/cart' className='relative group'>

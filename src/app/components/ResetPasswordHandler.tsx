@@ -12,14 +12,14 @@ export default function ResetPasswordHandler() {
     // Verificar si hay un token de reset de contraseña en el hash
     const hash = window.location.hash;
     if (hash && hash.includes('access_token')) {
-      console.log('Home: Reset password token detected in hash:', hash);
+      // Home: Reset password token detected in hash
 
       const urlParams = new URLSearchParams(hash.substring(1));
       const accessToken = urlParams.get('access_token');
       const type = urlParams.get('type');
 
       if (accessToken && type === 'recovery') {
-        console.log('Home: Opening reset password modal');
+        // Home: Opening reset password modal
         // Limpiar el hash de la URL
         window.history.replaceState(null, '', window.location.pathname);
         // Store current path for redirect after password reset
@@ -34,7 +34,7 @@ export default function ResetPasswordHandler() {
     const resetParam = searchParams.get('reset');
 
     if (resetParam === 'true') {
-      console.log('Home: Reset parameter detected, waiting for token...');
+      // Home: Reset parameter detected, waiting for token...
       // Clean up the reset parameter
       const url = new URL(window.location.href);
       url.searchParams.delete('reset');

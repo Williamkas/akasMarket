@@ -37,7 +37,7 @@ export default function AuthHydration() {
           setUser(userData);
           console.log('User session restored:', userData);
         } else {
-          console.log('No active session found');
+          // No active session found
         }
       } catch (error) {
         console.log('Error checking session:', error);
