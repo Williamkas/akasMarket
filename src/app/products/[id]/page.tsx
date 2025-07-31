@@ -7,9 +7,11 @@ import { getProductDetails } from '@/services/productService';
 import { useCartStore } from '@/store/useCartStore';
 import type { Product } from '@/services/productsService';
 import { useFavoritesStore, useFavoritesHydration } from '@/store/useFavoritesStore';
+import { useAuthStore } from '@/store/useAuthStore';
 import Image from 'next/image';
 import CustomDropdown from '@/app/components/CustomDropdown';
 import Breadcrumb from '../../components/Breadcrumb';
+import AuthModal from '../../components/AuthModal';
 import { toast } from 'sonner';
 
 const BackButton = () => (
@@ -32,11 +34,13 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const { addToCart, items, hydrated: cartHydrated } = useCartStore();
   const cartItem = items.find((item) => item.product.id === productId);
   const { isFavorite, addFavorite, removeFavorite } = useFavoritesStore();
   const favorite = isFavorite(productId);
+  const { isAuthenticated, setRedirectUrl, clearRedirectUrl } = useAuthStore();
 
   // Handle favorites hydration
   useFavoritesHydration();
@@ -95,7 +99,29 @@ export default function ProductDetail() {
 
   const handleBuyNow = () => {
     if (product) {
-      router.push(`/checkout?buyNow=1&id=${product.id}&qty=${quantity}`);
+      if (isAuthenticated) {
+        // Usuario logueado: ir directo a checkout
+        router.push(`/checkout?buyNow=1&id=${product.id}&qty=${quantity}`);
+      } else {
+        // Usuario no logueado: mostrar modal de login
+        setRedirectUrl(`/checkout?buyNow=1&id=${product.id}&qty=${quantity}`);
+        setShowAuthModal(true);
+      }
+    }
+  };
+
+  const handleCloseAuthModal = () => {
+    setShowAuthModal(false);
+    clearRedirectUrl();
+  };
+
+  const handleAuthSuccess = () => {
+    setShowAuthModal(false);
+    // Usar el redirectUrl del store para hacer el redirect automático
+    const { redirectUrl } = useAuthStore.getState();
+    if (redirectUrl) {
+      router.push(redirectUrl);
+      clearRedirectUrl();
     }
   };
 
@@ -313,6 +339,15 @@ export default function ProductDetail() {
           </div>
         </div>
       </div>
+      {showAuthModal && (
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={handleCloseAuthModal}
+          onSuccess={handleAuthSuccess}
+          title='Finalizar compra'
+          description='Inicia sesión para poder finalizar la compra.'
+        />
+      )}
     </div>
   );
 }

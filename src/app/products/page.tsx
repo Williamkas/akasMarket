@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useProductStore } from '../../store/useProductStore';
 import ProductGrid from '../components/ProductGrid';
 import ProductSortOptions from '../components/ProductSortOptions';
@@ -16,6 +16,7 @@ export default function ProductsPage() {
   const { isAuthenticated } = useAuth();
   const { setRedirectUrl, clearRedirectUrl } = useAuthStore();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const hasOpenedModal = useRef(false);
 
   useEffect(() => {
     if (!hydrated) return; // Don't fetch until hydrated
@@ -51,52 +52,31 @@ export default function ProductsPage() {
   // Check if user came from home and is not authenticated
   useEffect(() => {
     if (hydrated && !isAuthenticated) {
-      // Check URL parameter first (more reliable)
-      const fromHomeParam = searchParams.get('from');
-      const isFromHomeParam = fromHomeParam === 'home';
+      const loginFromHome = searchParams.get('loginFromHome');
 
-      // Fallback to referrer check
-      const referrer = document.referrer;
-      const currentOrigin = window.location.origin;
-      const currentPath = window.location.pathname;
-
-      console.log('Auth check:', {
-        fromHomeParam,
-        isFromHomeParam,
-        referrer,
-        currentOrigin,
-        currentPath,
-        referrerIncludesOrigin: referrer.includes(currentOrigin),
-        referrerEndsWithSlash: referrer.endsWith('/'),
-        referrerEqualsOrigin: referrer === currentOrigin,
-        referrerEqualsOriginSlash: referrer === currentOrigin + '/'
-      });
-
-      const isFromHomeReferrer =
-        referrer.includes(currentOrigin) &&
-        (referrer.endsWith('/') || referrer === currentOrigin || referrer === currentOrigin + '/');
-
-      const isFromHome = isFromHomeParam || isFromHomeReferrer;
-      console.log('Is from home:', isFromHome);
-
-      if (isFromHome) {
+      if (loginFromHome === '1' && !hasOpenedModal.current) {
         console.log('Opening auth modal from home');
         setRedirectUrl('/products');
 
-        // Clean up the URL parameter if it exists
-        if (isFromHomeParam) {
-          const url = new URL(window.location.href);
-          url.searchParams.delete('from');
-          window.history.replaceState({}, '', url.toString());
-        }
+        // Clean up the URL parameter
+        const url = new URL(window.location.href);
+        url.searchParams.delete('loginFromHome');
+        window.history.replaceState({}, '', url.toString());
 
         // Small delay to make the modal opening feel more natural
         setTimeout(() => {
           setShowAuthModal(true);
+          hasOpenedModal.current = true;
         }, 500);
       }
     }
   }, [hydrated, isAuthenticated, setRedirectUrl, searchParams]);
+
+  const handleCloseAuthModal = () => {
+    setShowAuthModal(false);
+    hasOpenedModal.current = true;
+    clearRedirectUrl();
+  };
 
   // Don't render until hydrated to prevent hydration mismatch
   if (!hydrated) {
@@ -143,14 +123,8 @@ export default function ProductsPage() {
 
       <AuthModal
         isOpen={showAuthModal}
-        onClose={() => {
-          setShowAuthModal(false);
-          clearRedirectUrl();
-        }}
-        onSuccess={() => {
-          setShowAuthModal(false);
-          clearRedirectUrl();
-        }}
+        onClose={handleCloseAuthModal}
+        onSuccess={handleCloseAuthModal}
         title='Iniciar sesión'
         description='Inicia sesión o crea una cuenta para acceder a tu perfil.'
       />

@@ -134,6 +134,21 @@ const AuthModal: React.FC<AuthModalProps> = ({
       // Update the auth store with user data
       if (result.data?.user) {
         setUser(result.data.user);
+        // --- Migración de datos guest a usuario ---
+        const userId = result.data.user.id;
+        if (typeof window !== 'undefined' && userId) {
+          const guestCart = localStorage.getItem('cart_guest');
+          const guestFavs = localStorage.getItem('favorites_guest');
+          if (guestCart && !localStorage.getItem(`cart_${userId}`)) {
+            localStorage.setItem(`cart_${userId}`, guestCart);
+            localStorage.removeItem('cart_guest');
+          }
+          if (guestFavs && !localStorage.getItem(`favorites_${userId}`)) {
+            localStorage.setItem(`favorites_${userId}`, guestFavs);
+            localStorage.removeItem('favorites_guest');
+          }
+        }
+        // --- Fin migración ---
         console.log('User set in store:', result.data.user);
       }
 

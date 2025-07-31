@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { Product } from '@/services/productsService';
+import { useAuthStore } from './useAuthStore';
 
 export interface CartItem {
   product: Product;
@@ -13,22 +14,20 @@ interface CartStore {
   addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
   deleteFromCart: (productId: string) => void;
+  clearCart: () => void;
   getCartCount: () => number;
 }
 
-const getInitialCart = (): CartItem[] => {
-  if (typeof window !== 'undefined') {
-    const stored = localStorage.getItem('cart');
-    if (stored) return JSON.parse(stored);
-  }
-  return [];
-};
+const getCartKey = (userId: string | null) => (userId ? `cart_${userId}` : 'cart_guest');
 
 export const useCartStore = create<CartStore>((set, get) => ({
   items: [],
   hydrated: false,
   setHydrated: () => {
-    set({ hydrated: true, items: getInitialCart() });
+    const userId = useAuthStore.getState().user?.id || null;
+    const key = getCartKey(userId);
+    const saved = typeof window !== 'undefined' ? localStorage.getItem(key) : null;
+    set({ hydrated: true, items: saved ? JSON.parse(saved) : [] });
   },
   addToCart: (product) => {
     set((state) => {
@@ -41,9 +40,10 @@ export const useCartStore = create<CartStore>((set, get) => ({
       } else {
         newItems = [...state.items, { product, quantity: 1 }];
       }
+      const userId = useAuthStore.getState().user?.id || null;
+      const key = getCartKey(userId);
       if (typeof window !== 'undefined') {
-        localStorage.setItem('cart', JSON.stringify(newItems));
-        window.dispatchEvent(new CustomEvent('cart-toast', { detail: { name: product.title } }));
+        localStorage.setItem(key, JSON.stringify(newItems));
       }
       return { items: newItems };
     });
@@ -60,16 +60,23 @@ export const useCartStore = create<CartStore>((set, get) => ({
       } else {
         newItems = state.items.filter((item) => item.product.id !== productId);
       }
-      if (typeof window !== 'undefined') localStorage.setItem('cart', JSON.stringify(newItems));
+      const userId = useAuthStore.getState().user?.id || null;
+      const key = getCartKey(userId);
+      if (typeof window !== 'undefined') localStorage.setItem(key, JSON.stringify(newItems));
       return { items: newItems };
     });
   },
   deleteFromCart: (productId) => {
     set((state) => {
       const newItems = state.items.filter((item) => item.product.id !== productId);
-      if (typeof window !== 'undefined') localStorage.setItem('cart', JSON.stringify(newItems));
+      const userId = useAuthStore.getState().user?.id || null;
+      const key = getCartKey(userId);
+      if (typeof window !== 'undefined') localStorage.setItem(key, JSON.stringify(newItems));
       return { items: newItems };
     });
+  },
+  clearCart: () => {
+    set({ items: [] });
   },
   getCartCount: () => {
     return get().items.reduce((acc, item) => acc + item.quantity, 0);

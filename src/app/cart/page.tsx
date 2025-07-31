@@ -33,12 +33,11 @@ const CartPage: React.FC = () => {
 
   const handleCheckout = () => {
     if (isAuthenticated) {
-      // Redirigir a la pasarela de pago
-      toast.success('Redirigiendo a la pasarela de pago...');
+      // Redirigir a checkout
       router.push('/checkout');
     } else {
       // Store current path for redirect after login
-      setRedirectUrl('/cart');
+      setRedirectUrl('/checkout');
       setShowAuthModal(true);
     }
   };
@@ -195,12 +194,12 @@ const CartPage: React.FC = () => {
           }}
           onSuccess={() => {
             setShowAuthModal(false);
-            // Aquí podrías redirigir a un gateway de pago
-            toast.success('¡Redirigiendo al pago...');
+            // Redirigir a checkout después del login
+            router.push('/checkout');
             clearRedirectUrl();
           }}
           title='Finalizar compra'
-          description='Necesitamos que inicies sesión para continuar con la compra.'
+          description='Inicia sesión para poder finalizar la compra.'
         />
       </div>
     </div>

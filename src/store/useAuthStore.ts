@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { useCartStore } from './useCartStore';
+import { useFavoritesStore } from './useFavoritesStore';
 
 interface User {
   id: string;
@@ -31,7 +33,9 @@ export const useAuthStore = create<AuthState>()(
       logout: async () => {
         try {
           await fetch('/api/auth/logout', { method: 'POST' });
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          useCartStore.getState().clearCart();
+          useFavoritesStore.getState().clearFavorites();
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (e) {
           // ignore
         }
