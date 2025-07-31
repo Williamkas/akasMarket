@@ -39,7 +39,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </main>
           <Footer />
         </div>
-
       </body>
     </html>
   );
